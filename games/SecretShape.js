@@ -34,6 +34,30 @@ class SecretShape {
 		if (typeof music_secretshape !== 'undefined') {
 			music_secretshape.play();
 		}
+		
+		// OTIMIZAÇÃO: A função text() no p5.js WEBGL gera uma imagem invisível nova a cada frame. 
+		// Para o jogo ficar a 60 FPS, precisamos criar a imagem do texto 1 vez e desenhá-la sempre.
+		this.gfxGire = this.createTextGraphic("GIRE!");
+		this.gfxEscolha = this.createTextGraphic("ESCOLHA!");
+		this.gfxCerto = this.createTextGraphic("CERTO!");
+		this.gfxErrado = this.createTextGraphic("ERRADO!");
+	}
+
+	createTextGraphic(txt) {
+		let gfx = createGraphics(600, 150);
+		gfx.textAlign(CENTER, CENTER);
+		gfx.textSize(80);
+		gfx.textFont("'Orbitron', sans-serif");
+		gfx.textStyle(BOLD);
+		gfx.stroke(0);
+		gfx.strokeWeight(5);
+		gfx.fill(255);
+		gfx.text(txt, 300, 75);
+		
+		// Converte para imagem estática da GPU para não pesar a CPU
+		let img = createImage(gfx.width, gfx.height);
+		img.copy(gfx, 0, 0, gfx.width, gfx.height, 0, 0, gfx.width, gfx.height);
+		return img;
 	}
 
 	shuffleArray(array) {
@@ -115,7 +139,7 @@ class SecretShape {
 	// === LOOP PRINCIPAL DO MICROGAME ===
 
 	draw() {
-		this.timer++;
+		this.timer += dt; // Incrementa baseado no tempo real, não frames brutos
 		
 		// Fundo verde como na referência
 		background(140, 190, 80);
@@ -165,14 +189,9 @@ class SecretShape {
 		resetMatrix();
 		ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
 		noLights(); // Garante que o texto fique sólido
-		fill(255);
-		textSize(80);
-		textAlign(CENTER, CENTER);
-		textFont("'Orbitron', sans-serif");
-		textStyle(BOLD);
-		stroke(0);
-		strokeWeight(5);
-		text("GIRE!", 0, -height / 4);
+		imageMode(CENTER);
+		scale(1, -1); // Em WEBGL a imagem desenha de ponta cabeça
+		image(this.gfxGire, 0, height / 4);
 		pop();
 		
 		// Desenha o Pedestal
@@ -214,13 +233,10 @@ class SecretShape {
 		
 		noLights();
 		
-		fill(255);
-		textSize(80);
-		textAlign(CENTER, CENTER);
-		textFont("'Orbitron', sans-serif");
-		stroke(0);
-		strokeWeight(5);
-		text("ESCOLHA!", 0, -height / 3);
+		imageMode(CENTER);
+		scale(1, -1); // Arrumar eixo Y da imagem
+		image(this.gfxEscolha, 0, height / 3);
+		scale(1, -1); // Desinverter para desenhar a barra corretamente
 		
 		// Barra de tempo sincronizada com a música!
 		let progress = 1.0;
@@ -261,8 +277,8 @@ class SecretShape {
 			noStroke();
 			
 			// Leve rotação contínua para apresentação da forma
-			rotateX(frameCount * 0.01);
-			rotateY(frameCount * 0.015);
+			rotateX(globalTime * 0.01);
+			rotateY(globalTime * 0.015);
 			
 			// Diminui um pouco a escala para caber bem no painel
 			scale(0.6);
@@ -285,8 +301,8 @@ class SecretShape {
 			directionalLight(255, 255, 255, 0.5, 1, -0.5);
 			fill(255, 200, 50); 
 			noStroke();
-			rotateX(frameCount * 0.02);
-			rotateY(frameCount * 0.03);
+			rotateX(globalTime * 0.02);
+			rotateY(globalTime * 0.03);
 			scale(1.5);
 			this.correctShape.draw();
 			pop();
@@ -298,8 +314,9 @@ class SecretShape {
 			resetMatrix();
 			ortho(-width/2, width/2, height/2, -height/2, 0, 1000);
 			noLights();
-			fill(255); stroke(0); strokeWeight(5); textSize(80); textAlign(CENTER, CENTER);
-			text("CERTO!", 0, -height/3);
+			imageMode(CENTER);
+			scale(1, -1);
+			image(this.gfxCerto, 0, height/3);
 			pop();
 			
 		} else {
@@ -311,8 +328,9 @@ class SecretShape {
 			resetMatrix();
 			ortho(-width/2, width/2, height/2, -height/2, 0, 1000);
 			noLights();
-			fill(255); stroke(0); strokeWeight(5); textSize(80); textAlign(CENTER, CENTER);
-			text("ERRADO!", 0, -height/3);
+			imageMode(CENTER);
+			scale(1, -1);
+			image(this.gfxErrado, 0, height/3);
 			pop();
 			
 			// Mostrar a forma real iluminada em cima
@@ -322,8 +340,8 @@ class SecretShape {
 			directionalLight(255, 255, 255, 0, 1, -1);
 			fill(255, 200, 50);
 			noStroke();
-			rotateX(frameCount * 0.01);
-			rotateY(frameCount * 0.02);
+			rotateX(globalTime * 0.01);
+			rotateY(globalTime * 0.02);
 			this.correctShape.draw();
 			pop();
 			
@@ -342,7 +360,7 @@ class SecretShape {
 				translate(0, 0, 40);
 				ambientLight(150); directionalLight(255, 255, 255, 0.5, 1, -0.5);
 				fill(255, 200, 50); noStroke();
-				rotateX(frameCount * 0.01); rotateY(frameCount * 0.015);
+				rotateX(globalTime * 0.01); rotateY(globalTime * 0.015);
 				scale(0.6);
 				this.options[i].draw();
 				pop();
@@ -382,12 +400,12 @@ class SecretShape {
 	drawConfetti() {
 		noLights(); // Flat design pros confetes
 		for (let c of this.confetti) {
-			c.x += c.vx;
-			c.y += c.vy;
-			c.z += c.vz;
-			c.rotX += c.rotSpeedX;
-			c.rotY += c.rotSpeedY;
-			c.rotZ += c.rotSpeedZ;
+			c.x += c.vx * dt;
+			c.y += c.vy * dt;
+			c.z += c.vz * dt;
+			c.rotX += c.rotSpeedX * dt;
+			c.rotY += c.rotSpeedY * dt;
+			c.rotZ += c.rotSpeedZ * dt;
 			
 			push();
 			translate(c.x, c.y, c.z);

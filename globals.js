@@ -16,9 +16,12 @@ let gameOverContainer;
 let highscoresList;
 let retryButton;
 let quitButton;
+
+// Imagens e Texturas
 let phaseDiv;
 let textGraphics;
 let gameOverGraphics;
+let lifeGraphics;
 
 // Variáveis de Jogo
 let score = 0;
@@ -27,12 +30,19 @@ let vidas = 4;
 let explosions = [];
 let currentMicrogame = null;
 let hubTimer = 0;
+let globalTime = 0; // Tempo independente de FPS
+let shaderTime = 0; // Tempo acumulado do shader, permite aceleração
+let dt = 1; 		// Delta time multiplier
+let shipIntroTimer = 60; // Timer para a animação de entrada da nave
 let instructionText = "Mouse"; // Base
 let lastResultStatus = 'WIN';
 
+// Controle Visual
+let drawShip = true;
+let arwingModel;
+
 // Recursos Globais (Shaders, Imagens, Áudios)
 let my_shader;
-let mouseImg;
 let music_normal;
 let music_vitoria;
 let music_derrota;
@@ -41,6 +51,13 @@ let music_gameover;
 let music_insta_gameover;
 let music_menu;
 
-// Controle Visual
-let drawShip = true;
-let arwingModel;
+// Modo Desempenho
+// 0 = Shader Resolução Máxima, 1 = Shader Resolução Baixa (Buffer), 2 = Imagem Estática
+let performanceMode = 0;
+let fpsDiv;
+let warningOverlay;
+let bgImage;
+let fpsHistory = [];
+let bgBuffer; 			// Buffer para o plano de fundo no modo desempenho 1
+const bgScale = 0.4;  	// Escala para o buffer de fundo (40% da resolução original)
+let bgShader; 			// Cópia do shader para o plano de fundo

@@ -37,6 +37,7 @@ float sdCylinder(vec3 p, float h, float r) {
     return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
 }
 
+// União de SDFs
 vec2 opU(vec2 d1, vec2 d2) {
     return (d1.x < d2.x) ? d1 : d2;
 }
@@ -57,18 +58,17 @@ float map(vec3 p) {
     float k = 4.0; // Raio do túnel
     float tube = length(p.xy) - k;
     
-    // Combinação das SDFs: O túnel é subtraído das esferas para criar um efeito de "buraco" no meio, e o resultado é max para manter a forma das esferas.
+    // Combinação das SDFs: mas de esfera e -tubo mostra todas esferas fora do túnel
     return max(obj, -tube);
 }
 
 // Star
 vec3 DrawStar(vec2 uv, float t) {
-    // Só renderiza se o raio foi muito longe (para economizar cálculo)
+    // Só renderiza se o raio foi muito longe 
     float starFade = smoothstep(15.0, 30.0, t);
     if (starFade <= 0.0) return vec3(0.0);
     
-    // 1. O NÚCLEO DA ESTRELA/PORTAL (Agora é uma Elipse Vertical)
-    // Multiplicar o X por um valor maior que o Y estica a forma verticalmente
+    // NÚCLEO DA ESTRELA/PORTAL 
     float radius = length(uv * vec2(1.0, 1.0)); 
     
     // Efeito de luz do núcleo (Glow principal)
@@ -78,17 +78,17 @@ vec3 DrawStar(vec2 uv, float t) {
     vec3 starColor = mix(vec3(0.9, 0.95, 1.0), vec3(0.5, 0.1, 0.9), clamp(radius * 3.0, 0.0, 1.0));
     starColor = mix(starColor, vec3(0.0, 0.2, 0.9), clamp(radius * 6.0, 0.0, 1.0));
     
-    // 2. OS FEIXES DE LUZ (Lens Flare)
+    // FEIXES DE LUZ 
     float flare = 0.0;
-    // Feixe Horizontal (Anamorphic)
+    // Feixe Horizontal 
     flare += 0.01 / (abs(uv.y) * 150.0 + abs(uv.x) * 1.5 + 0.001);
-    // Feixe Vertical (Ajustado para combinar com a elipse)
+    // Feixe Vertical 
     flare += 0.01 / (abs(uv.x) * 150.0 + abs(uv.y) * 2.0 + 0.001);
     
     // Feixes Diagonais
     vec2 uvDiag = vec2(uv.x * 0.707 - uv.y * 0.707, uv.x * 0.707 + uv.y * 0.707);
-    flare += 0.005 / (abs(uvDiag.x) * 200.0 + abs(uvDiag.y) * 15.0 + 0.001);
-    flare += 0.005 / (abs(uvDiag.y) * 200.0 + abs(uvDiag.x) * 15.0 + 0.001);
+    flare += 0.02 / (abs(uvDiag.x) * 200.0 + abs(uvDiag.y) * 15.0 + 0.001);
+    flare += 0.02 / (abs(uvDiag.y) * 200.0 + abs(uvDiag.x) * 15.0 + 0.001);
     
     flare *= smoothstep(1.5, 0.0, length(uv));
     
@@ -105,22 +105,20 @@ void main() {
     vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
     
     // Translate do cenário para cima 
-    uv.y -= 0.2;
+    uv.y -= 0.2; 
     
     // Inicialização 
     vec3 ro = vec3(0.0, 0.0, -2.0);     // Origem do raio (câmera)
     vec3 rd = normalize(vec3(uv, 1.0)); // Direção do raio
     vec3 col = vec3(0.0);               // Cor final do pixel
     
-    // Câmera
-    // Normalizamos a posição do mouse (de -1 a 1)
-    vec2 m = (iMouse.xy * 2.0 - iResolution.xy) / iResolution.y;
-    if (iMouse.x == 0.0 && iMouse.y == 0.0) m = vec2(0.0); // Posição neutra inicial
+    // Mouse
+    vec2 m = (iMouse.xy * 2.0 - iResolution.xy) / iResolution.y;    // Normalizar posição do mouse (de -1 a 1)
+    if (iMouse.x == 0.0 && iMouse.y == 0.0) m = vec2(0.0);          // Posição neutra inicial
     
-    // Giramos a direção do raio (câmera) levemente com base no mouse
-    // Isso cria o efeito de "olhar para os lados e para cima/baixo"
-    rd.yz *= rot2D(m.y * 0.01); // Olha para cima/baixo
-    rd.xz *= rot2D(m.x * 0.01); // Olha para os lados
+    // Girar a direção do raio (câmera) levemente com base no mouse
+    rd.yz *= rot2D(-m.y * 0.02); // Olha para cima/baixo
+    rd.xz *= rot2D(-m.x * 0.02); // Olha para os lados
     
     float t = 0.0;
     float iters = 0.0;
@@ -137,8 +135,8 @@ void main() {
         t += d;
         iters = float(i);
         
-        // Otimização: Parar se colidir (<0.001) ou se for muito longe (30.0)
-        if (d < 0.001 || t > 30.0) break;
+        // Otimização: Parar se colidir (<0.005) ou se for muito longe (30.0)
+        if (d < 0.005  || t > 30.0) break;
     }
     
 

@@ -1,12 +1,9 @@
-function preload() {
+﻿function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
-	// Load de imagens
-	mouseImg = loadImage("images/mouse.png");
-
 	// Load de sons
-	// Aúdios do jogo WarioWare Smooth Moves
+	// Aúdios do jogo WarioWare Smooth Moves 
 	// https://www.youtube.com/watch?v=j5hNgRom-3M
 	// https://www.youtube.com/watch?v=-UewSOg2Qbs&list=PL7443260FEE96175F&index=47
 	music_normal = loadSound("audios/orbulon.mp3");
@@ -15,14 +12,23 @@ function preload() {
 	music_secretshape = loadSound("audios/secret_shape.mp3");
 	music_gameover = loadSound("audios/gameover.mp3");
 	music_insta_gameover = loadSound("audios/insta_gameover.mp3");
-	music_menu = loadSound("audios/menu.mp3");
+	music_menu = loadSound("audios/menu.mp3"); // Instrumental da música "Recollect": https://youtu.be/IAlUCKYsI0U?si=0Ytkm9xjhfJNEiPO
+
+	// Load de imagens
+	bgImage = loadImage("images/fundo.png");
 }
 
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
+	frameRate(60);
 	pixelDensity(1);
 	noStroke();
 
+	// Configurações para o plano de fundo no modo desempenho 1 - Buffer com shader renderizado em baixa resolução
+	bgBuffer = createGraphics(max(1, floor(windowWidth * bgScale)), max(1, floor(windowHeight * bgScale)), WEBGL);
+	bgBuffer.noStroke();
+	bgShader = my_shader.copyToContext(bgBuffer);
+	
 	// Gráfico para instruções da fase
 	textGraphics = createGraphics(400, 100);
 	textGraphics.textAlign(CENTER, CENTER);
@@ -42,6 +48,33 @@ function setup() {
 	gameOverGraphics.strokeWeight(8);
 	gameOverGraphics.text("GAME OVER", 400, 100);
 
+	// Gráfico cacheado para as vidas (fogo)
+	lifeGraphics = createGraphics(160, 160);
+	lifeGraphics.translate(80, 80);
+	lifeGraphics.scale(2); // Desenha maior para não perder qualidade ao escalar na tela
+	lifeGraphics.stroke(0);
+	lifeGraphics.strokeWeight(1);
+	lifeGraphics.fill(255, 80, 0);
+	lifeGraphics.beginShape(); // Parte externa da chama
+	lifeGraphics.vertex(0, 35); 
+	lifeGraphics.bezierVertex(35, 5, 35, -35, 0, -35); 
+	lifeGraphics.bezierVertex(-35, -35, -35, 5, 0, 35);
+	lifeGraphics.endShape(CLOSE);
+	lifeGraphics.noStroke(); // Parte interna da chama 
+	lifeGraphics.fill(255, 220, 0);
+	lifeGraphics.beginShape();
+	lifeGraphics.vertex(0, 15);
+	lifeGraphics.bezierVertex(18, -5, 18, -25, 0, -25);
+	lifeGraphics.bezierVertex(-18, -25, -18, -5, 0, 15);
+	lifeGraphics.endShape(CLOSE);
+	lifeGraphics.fill(255);
+	lifeGraphics.ellipse(0, -18, 12, 12); // Centro do fogo
+	
+	// Converter p5.Graphics para p5.Image estática 
+	let img = createImage(lifeGraphics.width, lifeGraphics.height);
+	img.copy(lifeGraphics, 0, 0, lifeGraphics.width, lifeGraphics.height, 0, 0, lifeGraphics.width, lifeGraphics.height);
+	lifeGraphics = img;
+
 	// HTML para o Número da Fase
 	phaseDiv = createDiv('');
 	phaseDiv.id('phaseDiv');
@@ -57,7 +90,6 @@ function setup() {
 	phaseDiv.style('pointer-events', 'none');
 	phaseDiv.style('display', 'none');
 	phaseDiv.style('transition', 'transform 0.25s ease-out'); 
-
 	setupStartUI();
 	setupGameOverUI();
 	
@@ -69,6 +101,9 @@ function setup() {
 
 function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
+	if (bgBuffer) {
+		bgBuffer.resizeCanvas(max(1, floor(windowWidth * bgScale)), max(1, floor(windowHeight * bgScale)));
+	}
 	if (startButton) {
 		startButton.position(width / 2 - 100, height - 100);
 	}
@@ -79,6 +114,23 @@ function windowResized() {
 
 // Atalhos do jogo para teste e debug
 function keyPressed() {
+	
+	// Alterna o Modo Desempenho entre os 3 níveis a qualquer momento apertando 'N'
+	if (key === 'n' || key === 'N') {
+		performanceMode = (performanceMode + 1) % 3; // Cicla entre 0, 1 e 2
+		
+		// Se a tela de aviso ainda estiver aberta, fecha ela
+		if (typeof warningOverlay !== 'undefined' && warningOverlay && warningOverlay.style('display') !== 'none') {
+			warningOverlay.style('display', 'none');
+		}
+		return; 
+	}
+
+	// Se houver overlay e não for 'N', ignora outros atalhos até fechar
+	if (typeof warningOverlay !== 'undefined' && warningOverlay && warningOverlay.style('display') !== 'none') {
+		return; 
+	}
+
 	if (currentState === GameState.START) return; 
 
 	// L para perder vida (ou resetar vidas se já estiver em 0)
@@ -134,22 +186,70 @@ function loseMicrogame() {
 }
 
 function draw() {
-	background(220);
+	// Calcula o Delta Time (1.0 = rodando perfeitamente a 60FPS. 2.0 = rodando a 30FPS)
+	dt = Math.min(deltaTime, 100) / (1000 / 60);
+	globalTime += dt;
+
+	if (shipIntroTimer > 0) {
+		shipIntroTimer -= dt;
+		if (shipIntroTimer < 0) shipIntroTimer = 0;
+	}
+
+	// Atualiza o tempo do shader com animações
+	let timeMultiplier = 1.0;
+	if (currentState === GameState.RESULT) {
+		if (lastResultStatus === 'WIN') {
+			if (hubTimer < 90) {
+				let p = hubTimer / 90.0;
+				// Acelera no meio da animação (pico em p=0.5)
+				timeMultiplier = 1.0 + sin(p * PI) * 8.0; 
+			}
+		} else if (lastResultStatus === 'LOSE') {
+			if (hubTimer < 90) {
+				let p = hubTimer / 90.0;
+				// Desacelera no meio da animação, quase parando
+				timeMultiplier = 1.0 - sin(p * PI) * 0.9; 
+			}
+		}
+	}
+	shaderTime += (deltaTime / 1000.0) * timeMultiplier;
+
+	// Atualiza o FPS apenas a cada 10 frames para evitar reflow no navegador
+	if (typeof fpsDiv !== 'undefined' && fpsDiv && frameCount % 10 === 0) {
+		let currentFps = frameRate();
+		fpsHistory.push(currentFps);
+		if (fpsHistory.length > 60) {
+			fpsHistory.shift();
+		}
+		
+		let sum = 0;
+		for (let i = 0; i < fpsHistory.length; i++) {
+			sum += fpsHistory[i];
+		}
+		let fpsAvg = sum / fpsHistory.length;
+		
+		fpsDiv.html(`FPS: ${floor(currentFps)} <span style="margin-left: 15px; font-size: 16px; color: #8f8;">Média: ${floor(fpsAvg)}</span>`);
+	}
+
+	background(0);
 
 	// Controle do phaseDiv: só aparece no HUB, TRANSITION e RESULT
+	if (typeof window.phaseDivVisible === 'undefined') window.phaseDivVisible = false;
+
 	if (currentState === GameState.HUB || currentState === GameState.TRANSITION || currentState === GameState.RESULT) {
-		if (phaseDiv.style('display') === 'none') phaseDiv.style('display', 'block');
-		phaseDiv.html(nf(score, 3));
+		if (!window.phaseDivVisible) {
+			phaseDiv.style('display', 'block');
+			window.phaseDivVisible = true;
+		}
+		// Atualiza o texto apenas se o valor mudou
+		if (window.lastScoreDisplayed !== score) {
+			phaseDiv.html(nf(score, 3));
+			window.lastScoreDisplayed = score;
+		}
 	} else {
-		if (phaseDiv.style('display') !== 'none') phaseDiv.style('display', 'none');
-	}
-	// Lógica do aviso da música: só aparece no Start Menu SE a música não estiver tocando
-	let hintEl = document.getElementById('musicHint');
-	if (hintEl) {
-		if (currentState === GameState.START && typeof music_menu !== 'undefined' && music_menu.isLoaded() && !music_menu.isPlaying()) {
-			hintEl.style.display = 'block';
-		} else {
-			hintEl.style.display = 'none';
+		if (window.phaseDivVisible) {
+			phaseDiv.style('display', 'none');
+			window.phaseDivVisible = false;
 		}
 	}
 
@@ -158,7 +258,7 @@ function draw() {
 		drawHubScene(); // Fundo + nave sempre visíveis no start, jogo em si e gameover
 		
 		if (currentState === GameState.HUB) {
-			hubTimer++;
+			hubTimer += dt;
 			if (hubTimer > 45) {
 				currentState = GameState.TRANSITION;
 				instructionText = "Mouse"; 
@@ -176,12 +276,12 @@ function draw() {
 			let progress = hubTimer / 25.0;
 			progress = 1 - Math.pow(1 - progress, 3); // ease-out
 			drawIris(progress, 0, height * 0.1, true);
-			hubTimer++;
+			hubTimer += dt;
 		}
 	} else if (currentState === GameState.RESULT) {
 		drawHubScene();
 		
-		hubTimer++;
+		hubTimer += dt;
 		let audioFinished = false;
 		if (lastResultStatus === 'LOSE') {
 			audioFinished = (!music_derrota || !music_derrota.isPlaying());
@@ -202,7 +302,7 @@ function draw() {
 		}
 	} else if (currentState === GameState.PRE_GAME_OVER) {
 		drawHubScene(); 
-		hubTimer++;
+		hubTimer += dt;
 		
 		push();
 		resetMatrix();

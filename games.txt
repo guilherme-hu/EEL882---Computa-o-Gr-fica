@@ -12,7 +12,6 @@ boomenrande
 match poses
 ninja lancando dardos   
 tracing
-gelo
 rotação
 preencher caminho de grafo
 édra papel tesou com mao aberta

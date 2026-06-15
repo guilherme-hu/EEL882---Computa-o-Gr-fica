@@ -83,8 +83,6 @@ function triggerGameOver() {
 	if (typeof music_gameover !== 'undefined' && !music_gameover.isPlaying()) {
 		music_gameover.loop();
 	}
-
-	let finalScore = score > 0 ? score : floor(random(1, 15)); // Random para teste se for 0
 	
 	// Exibe pontuação atual
 	let scoreEl = document.getElementById('currentScoreDiv');
@@ -121,7 +119,9 @@ function retryGame() {
 	vidas = 4;
 	score = 0;
 	explosions = [];
-	gameOverContainer.style('transition', 'none'); // Remove fade-out
+	hubTimer = 0;
+	shipIntroTimer = 60;
+	gameOverContainer.style('transition', 'none'); 
 	gameOverContainer.style('opacity', '0');
 	gameOverContainer.hide();
 	currentState = GameState.HUB;
@@ -137,7 +137,9 @@ function quitGame() {
 	vidas = 4;
 	score = 0;
 	explosions = [];
-	gameOverContainer.style('transition', 'none'); // Remove fade-out
+	hubTimer = 0;
+	shipIntroTimer = 60;
+	gameOverContainer.style('transition', 'none'); 
 	gameOverContainer.style('opacity', '0');
 	gameOverContainer.hide();
 	currentState = GameState.START;
