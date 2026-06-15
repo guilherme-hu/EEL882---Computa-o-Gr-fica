@@ -84,6 +84,8 @@ function triggerGameOver() {
 		music_gameover.loop();
 	}
 	
+	let finalScore = score > 0 ? score : floor(random(1, 15)); // Random para teste se for 0
+	
 	// Exibe pontuação atual
 	let scoreEl = document.getElementById('currentScoreDiv');
 	if (scoreEl) scoreEl.innerHTML = `Sua pontuação: <span style="color:#ff5000">${finalScore} pts</span>`;
