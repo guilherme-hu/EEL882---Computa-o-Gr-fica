@@ -7,8 +7,8 @@ class WhackABump {
 		this.particles = [];
 		this.clickTargets = [];
 		
-		this.nu = 7;
-		this.nv = 7;
+		this.nu = 5;
+		this.nv = 5;
 		this.ctrl = [];
 		let extent = 800; // Aumentado para ocupar mais espaço
 		let sp = extent / (this.nu - 1);
@@ -30,8 +30,8 @@ class WhackABump {
 		// Escolher 2 pontos internos aleatórios para elevar (os "galos")
 		let elevated = 0;
 		while(elevated < 2) {
-			let i = floor(random(1, 6)); // Entre 1 e 5 (borda interna)
-			let j = floor(random(1, 6));
+			let i = floor(random(1, 4)); // Entre 1 e 4 (borda interna)
+			let j = floor(random(1, 4));
 			if (this.ctrl[i][j].targetZ === 0) {
 				// Galos apontam para cima (com rotateX positivo, o eixo Z positivo sobe na tela)
 				this.ctrl[i][j].targetZ = 200;
@@ -196,8 +196,8 @@ class WhackABump {
 			let spawned = false;
 			let attempts = 0;
 			while(!spawned && attempts < 20) {
-				let i = floor(random(1, 6));
-				let j = floor(random(1, 6));
+				let i = floor(random(1, 4));
+				let j = floor(random(1, 4));
 				if (this.ctrl[i][j].targetZ === 0 && this.ctrl[i][j].z < 5) {
 					this.ctrl[i][j].targetZ = 200; // Define que ele quer ser um galo
 					// Não alteramos o z atual, assim a lógica de animação fará ele crescer!
@@ -239,9 +239,7 @@ class WhackABump {
 		
 		if (this.dirty) {
 			let sub = this.ctrl;
-			for (let r = 0; r < 3; r++) { // 3 subdivisões
-				sub = this.subdivideSurface(sub);
-			}
+			sub = this.subdivideSurface(sub);
 			this.surf_pts = sub;
 			this.dirty = false;
 		}
