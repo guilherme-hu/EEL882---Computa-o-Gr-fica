@@ -1,4 +1,4 @@
-﻿function preload() {
+function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -10,9 +10,23 @@
 	music_vitoria = loadSound("audios/orbulon_vit.mp3");
 	music_derrota = loadSound("audios/orbulon_der.mp3");
 	music_secretshape = loadSound("audios/secret_shape.mp3");
+	audio_beziermatch = loadSound("audios/bezier_match.mp3");
+	audio_bonk = loadSound("audios/bonk.mp3");
 	music_gameover = loadSound("audios/gameover.mp3");
 	music_insta_gameover = loadSound("audios/insta_gameover.mp3");
 	music_menu = loadSound("audios/menu.mp3"); // Instrumental da música "Recollect": https://youtu.be/IAlUCKYsI0U?si=0Ytkm9xjhfJNEiPO
+
+	// Voicelines de vitória e derrota com regulagem de volume individual
+	voicelines_win = [
+		{ sound: loadSound("audios/voicelines/hehehe.mp3"), vol: 1.0 },
+		{ sound: loadSound("audios/voicelines/yipeee.mp3"), vol: 0.8 }
+	];
+
+	voicelines_lose = [
+		{ sound: loadSound("audios/voicelines/bruh.mp3"), vol: 1.0 },
+		{ sound: loadSound("audios/voicelines/clash_cry.mp3"), vol: 0.6 },
+		{ sound: loadSound("audios/voicelines/nah.mp3"), vol: 1.0 }
+	];
 
 	// Load de imagens
 	bgImage = loadImage("images/fundo.png");
@@ -131,6 +145,16 @@ function keyPressed() {
 		return; 
 	}
 
+
+	// Atalho para mutar o som do jogo (M)
+	if (key === 'm' || key === 'M') {
+		isMuted = !isMuted;
+		if (typeof outputVolume === 'function') {
+			outputVolume(isMuted ? 0 : 1);
+		}
+		return;
+	}
+
 	if (currentState === GameState.START) return; 
 
 	// L para perder vida (ou resetar vidas se já estiver em 0)
@@ -167,6 +191,14 @@ function mousePressed() {
 	}
 }
 
+function mouseReleased() {
+	if (currentState === GameState.MICROGAME && currentMicrogame) {
+		if (typeof currentMicrogame.mouseReleased === 'function') {
+			currentMicrogame.mouseReleased();
+		}
+	}
+}
+
 function winMicrogame() {
 	lastResultStatus = 'WIN';
 	currentState = GameState.RESULT;
@@ -176,6 +208,15 @@ function winMicrogame() {
 	if (music_vitoria) music_vitoria.play();
 }
 
+// Toca a voiceline assim que a condição de vitória é atingida dentro do minigame
+function playWinVoiceline() {
+	if (enableVoicelines && !isMuted && voicelines_win && voicelines_win.length > 0) {
+		let vl = random(voicelines_win);
+		vl.sound.setVolume(vl.vol);
+		vl.sound.play();
+	}
+}
+
 function loseMicrogame() {
 	lastResultStatus = 'LOSE';
 	currentState = GameState.RESULT;
@@ -183,6 +224,13 @@ function loseMicrogame() {
 	if (music_normal && music_normal.isPlaying()) music_normal.pause();
 	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
 	performExplosion();
+	
+	// Toca uma voiceline aleatória de derrota
+	if (enableVoicelines && !isMuted && voicelines_lose.length > 0) {
+		let vl = random(voicelines_lose);
+		vl.sound.setVolume(vl.vol);
+		vl.sound.play();
+	}
 }
 
 function draw() {

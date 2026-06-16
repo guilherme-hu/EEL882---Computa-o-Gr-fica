@@ -101,8 +101,29 @@ function drawTransitionPhase() {
 		
 		if (music_normal) music_normal.stop();
 		
-		if (typeof SecretShape !== 'undefined') {
-			currentMicrogame = new SecretShape(); // Inicializa se existir
+		if (availableMicrogames.length === 0) {
+			availableMicrogames = [...allMicrogames];
+		}
+		
+		let randomIndex = floor(random(availableMicrogames.length));
+		let nextGameName = availableMicrogames.splice(randomIndex, 1)[0];
+		
+		// Retoma a música caso o microgame use música paralela (opcional)
+		if (nextGameName === 'SecretShape' && typeof music_secretshape !== 'undefined') {
+			music_secretshape.play();
+			if (music_normal) music_normal.pause();
+		} else if (nextGameName === 'BezierMatch') {
+			if (music_normal) music_normal.pause();
+		} else if (nextGameName === 'WhackABump') {
+			if (music_normal) music_normal.pause();
+		}
+		
+		if (nextGameName === 'SecretShape') {
+			currentMicrogame = new SecretShape();
+		} else if (nextGameName === 'BezierMatch') {
+			currentMicrogame = new BezierMatch();
+		} else if (nextGameName === 'WhackABump') {
+			currentMicrogame = new WhackABump();
 		} else {
 			// Dummy temporário para não dar crash se a classe ainda não existir
 			currentMicrogame = { draw: () => { background(50); fill(255); textSize(32); text("Microgame Dummy (Implementar!)", 0, 0); }, mousePressed: () => {}, mouseDragged: () => {} }; 

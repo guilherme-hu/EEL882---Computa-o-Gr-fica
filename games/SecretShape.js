@@ -454,6 +454,7 @@ class SecretShape {
 				if (selectedOption === this.correctIndex) {
 					this.result = 'WIN';
 					this.createConfetti();
+					if (typeof playWinVoiceline === 'function') playWinVoiceline();
 				} else {
 					this.result = 'LOSE';
 					this.wrongChoiceIndex = selectedOption;

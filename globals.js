@@ -29,11 +29,14 @@ let highscores = [];
 let vidas = 4;
 let explosions = [];
 let currentMicrogame = null;
+let allMicrogames = ['SecretShape', 'BezierMatch', 'WhackABump'];
+let availableMicrogames = [];
 let hubTimer = 0;
 let globalTime = 0; // Tempo independente de FPS
 let shaderTime = 0; // Tempo acumulado do shader, permite aceleração
 let dt = 1; 		// Delta time multiplier
 let shipIntroTimer = 60; // Timer para a animação de entrada da nave
+let isMuted = false; // Controle global de mute
 let instructionText = "Mouse"; // Base
 let lastResultStatus = 'WIN';
 
@@ -47,9 +50,15 @@ let music_normal;
 let music_vitoria;
 let music_derrota;
 let music_secretshape;
+let audio_beziermatch;
+let audio_bonk;
 let music_gameover;
 let music_insta_gameover;
 let music_menu;
+
+let voicelines_win = [];
+let voicelines_lose = [];
+let enableVoicelines = false; // Hardcoded: trocar para false para desativar as vozes de comemoração e derrota
 
 // Modo Desempenho
 // 0 = Shader Resolução Máxima, 1 = Shader Resolução Baixa (Buffer), 2 = Imagem Estática
