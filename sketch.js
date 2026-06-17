@@ -1,4 +1,4 @@
-function preload() {
+﻿function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -19,12 +19,13 @@ function preload() {
 	// Voicelines de vitória e derrota com regulagem de volume individual
 	voicelines_win = [
 		{ sound: loadSound("audios/voicelines/hehehe.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/yipeee.mp3"), vol: 0.8 }
+		{ sound: loadSound("audios/voicelines/yipeee.mp3"), vol: 1.0 },
+		{ sound: loadSound("audios/voicelines/yayy.mp3"), vol: 1.0 }
 	];
 
 	voicelines_lose = [
 		{ sound: loadSound("audios/voicelines/bruh.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/clash_cry.mp3"), vol: 0.6 },
+		{ sound: loadSound("audios/voicelines/clash_cry.mp3"), vol: 1.0 },
 		{ sound: loadSound("audios/voicelines/nah.mp3"), vol: 1.0 }
 	];
 

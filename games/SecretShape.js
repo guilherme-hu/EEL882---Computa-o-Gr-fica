@@ -12,24 +12,37 @@ class SecretShape {
 		this.wrongChoiceIndex = -1;
 		this.confetti = [];
 		
-		this.shapes = [
-			{ id: 'cube', draw: () => box(120) },
-			{ id: 'sphere', draw: () => sphere(80) },
-			{ id: 'cylinder', draw: () => cylinder(60, 150) },
-			{ id: 'cone', draw: () => cone(70, 150) },
-			{ id: 'torus', draw: () => torus(60, 25) },
-			{ id: 'truncPyramid', draw: () => this.drawTruncatedPyramid(40, 80, 140) }, // Custom
-			{ id: 'cuica', draw: () => this.drawCuica() }, // Custom
-			{ id: 'mushroom', draw: () => this.drawMushroom() } // Outra forma custom
-		];
+		this.initShapes();
 		
-		// Embaralha as formas e escolhe 3
-		let shuffled = this.shuffleArray([...this.shapes]);
-		this.options = shuffled.slice(0, 3);
+		// Lógica nova para garantir probabilidade uniforme para todos os sólidos (chance exata de 1/12)
+		// 1. Sorteia a forma secreta de todo o pool disponível
+		this.correctShape = this.shapesInfo[Math.floor(Math.random() * this.shapesInfo.length)];
 		
-		// A forma secreta é uma das 3 escolhidas
-		this.correctIndex = floor(random(3));
-		this.correctShape = this.options[this.correctIndex];
+		// 2. Escolhe uma das classes válidas dessa forma para balizar as opções falsas
+		this.chosenClass = this.correctShape.classes[Math.floor(Math.random() * this.correctShape.classes.length)];
+		
+		// 3. Pega todas as formas que compartilham essa classe (para o usuário se confundir)
+		let validShapes = this.shapesInfo.filter(s => s.classes.indexOf(this.chosenClass) !== -1);
+		
+		// 4. Remove a forma correta da lista de opções falsas
+		validShapes = validShapes.filter(s => s.id !== this.correctShape.id);
+		
+		// 5. Embaralha as outras formas válidas e pega 2 opções
+		validShapes = this.shuffleArray([...validShapes]);
+		let wrongOptions = validShapes.slice(0, 2);
+		
+		// 6. Junta a forma correta com as erradas e embaralha a ordem na tela
+		this.options = this.shuffleArray([this.correctShape, ...wrongOptions]);
+		this.correctIndex = this.options.findIndex(s => s.id === this.correctShape.id);
+		
+		// Define a rotação base dependendo da classe (para que o objeto sempre comece olhando para a câmera na pose ideal)
+		let rot = this.correctShape.rotations[this.chosenClass];
+		this.baseRotX = rot.rx;
+		this.baseRotY = rot.ry;
+		
+		// Rotação acumulada pelo mouse (começa zerada para evitar gimbal lock)
+		this.rotX = 0;
+		this.rotY = 0;
 		
 		if (typeof music_secretshape !== 'undefined') {
 			music_secretshape.play();
@@ -43,21 +56,94 @@ class SecretShape {
 		this.gfxErrado = this.createTextGraphic("ERRADO!");
 	}
 
+	initShapes() {
+		this.shapesInfo = [
+			{
+				id: 'cube',
+				classes: ['Quad'],
+				draw: () => box(120),
+				rotations: { 'Quad': {rx: 0, ry: 0} }
+			},
+			{
+				id: 'paralelepipedo',
+				classes: ['Quad'],
+				draw: () => box(120, 120, 240),
+				rotations: { 'Quad': {rx: 0, ry: 0} }
+			},
+			{
+				id: 'truncPyramid',
+				classes: ['Quad'],
+				draw: () => this.drawTruncatedPyramid(30, 60, 150),
+				rotations: { 'Quad': {rx: -HALF_PI, ry: 0} }
+			},
+			{
+				id: 'losango',
+				classes: ['Quad'],
+				draw: () => this.drawLosango(60, 160),
+				rotations: { 'Quad': {rx: -HALF_PI, ry: 0} } // Padronizado para -HALF_PI
+			},
+			{
+				id: 'sphere',
+				classes: ['Circ'],
+				draw: () => sphere(60),
+				rotations: { 'Circ': {rx: 0, ry: 0} }
+			},
+			{
+				id: 'elipsoide',
+				classes: ['Circ'],
+				draw: () => ellipsoid(60, 120, 60),
+				rotations: { 'Circ': {rx: -HALF_PI, ry: 0} } // Padronizado
+			},
+			{
+				id: 'seta',
+				classes: ['Circ'],
+				draw: () => this.drawSeta(25, 100, 60, 60),
+				rotations: { 'Circ': {rx: -HALF_PI, ry: 0} }
+			},
+			{
+				id: 'cylinder',
+				classes: ['Quad', 'Circ'],
+				draw: () => cylinder(60, 120),
+				rotations: { 'Quad': {rx: 0, ry: 0}, 'Circ': {rx: -HALF_PI, ry: 0} } // Padronizado
+			},
+			{
+				id: 'cone',
+				classes: ['Piram', 'Circ'],
+				draw: () => cone(60, 120),
+				rotations: { 'Piram': {rx: 0, ry: 0}, 'Circ': {rx: -HALF_PI, ry: 0} }
+			},
+			{
+				id: 'squarePyramid',
+				classes: ['Piram', 'Quad'],
+				draw: () => { push(); rotateY(PI/4); this.drawSquarePyramid(60, 120); pop(); },
+				rotations: { 'Piram': {rx: 0, ry: 0}, 'Quad': {rx: -HALF_PI, ry: 0} }
+			},
+			{
+				id: 'tetraedro',
+				classes: ['Piram'],
+				draw: () => { push(); rotateY(-PI/6); this.drawTetrahedron(69.3, 120); pop(); },
+				rotations: { 'Piram': {rx: 0, ry: 0} }
+			},
+			{
+				id: 'coneTruncado',
+				classes: ['Circ'],
+				draw: () => this.drawTruncatedCone(60, 30, 120),
+				rotations: { 'Circ': {rx: -HALF_PI, ry: 0} }
+			}
+		];
+	}
+
 	createTextGraphic(txt) {
-		let gfx = createGraphics(600, 150);
+		let gfx = createGraphics(800, 200);
+		gfx.clear();
+		gfx.fill(0); // Cor preta
 		gfx.textAlign(CENTER, CENTER);
-		gfx.textSize(80);
-		gfx.textFont("'Orbitron', sans-serif");
-		gfx.textStyle(BOLD);
-		gfx.stroke(0);
-		gfx.strokeWeight(5);
-		gfx.fill(255);
-		gfx.text(txt, 300, 75);
+		gfx.textFont('Georgia');
+		gfx.textSize(120);
+		gfx.textStyle(NORMAL);
+		gfx.text(txt, 400, 100);
 		
-		// Converte para imagem estática da GPU para não pesar a CPU
-		let img = createImage(gfx.width, gfx.height);
-		img.copy(gfx, 0, 0, gfx.width, gfx.height, 0, 0, gfx.width, gfx.height);
-		return img;
+		return gfx;
 	}
 
 	shuffleArray(array) {
@@ -115,24 +201,125 @@ class SecretShape {
 		pop();
 	}
 	
-	drawCuica() {
+	drawSquarePyramid(r, h) {
 		push();
-		// Corpo da cuíca
-		cylinder(50, 100); 
-		// Vareta no meio
-		translate(0, -70, 0);
-		cylinder(5, 60);
+		let halfH = h / 2;
+		beginShape(TRIANGLES);
+		// Front
+		vertex(0, -halfH, 0); vertex(-r, halfH, r); vertex(r, halfH, r);
+		// Right
+		vertex(0, -halfH, 0); vertex(r, halfH, r); vertex(r, halfH, -r);
+		// Back
+		vertex(0, -halfH, 0); vertex(r, halfH, -r); vertex(-r, halfH, -r);
+		// Left
+		vertex(0, -halfH, 0); vertex(-r, halfH, -r); vertex(-r, halfH, r);
+		endShape();
+		beginShape(QUADS);
+		// Bottom
+		vertex(-r, halfH, r); vertex(r, halfH, r); vertex(r, halfH, -r); vertex(-r, halfH, -r);
+		endShape();
+		pop();
+	}
+	
+	drawTetrahedron(r, h) {
+		push();
+		let halfH = h / 2;
+		let a1 = 0;
+		let a2 = TWO_PI / 3;
+		let a3 = 2 * TWO_PI / 3;
+		let x1 = r * cos(a1); let z1 = r * sin(a1);
+		let x2 = r * cos(a2); let z2 = r * sin(a2);
+		let x3 = r * cos(a3); let z3 = r * sin(a3);
+		
+		beginShape(TRIANGLES);
+		// Faces laterais
+		vertex(0, -halfH, 0); vertex(x1, halfH, z1); vertex(x2, halfH, z2);
+		vertex(0, -halfH, 0); vertex(x2, halfH, z2); vertex(x3, halfH, z3);
+		vertex(0, -halfH, 0); vertex(x3, halfH, z3); vertex(x1, halfH, z1);
+		// Base
+		vertex(x1, halfH, z1); vertex(x3, halfH, z3); vertex(x2, halfH, z2);
+		endShape();
+		pop();
+	}
+	
+	drawSeta(cylR, cylH, coneR, coneH) {
+
+		// base do cilindro
+		push();
+		translate(0, cylH/2, 0);
+		cylinder(cylR, cylH);
+		pop();
+		// ponta do cone
+		push();
+		translate(0, -coneH/2, 0);
+		rotateX(PI);
+		cone(coneR, coneH);
 		pop();
 	}
 
-	drawMushroom() {
+	drawLosango(r, h) {
 		push();
-		// Caule
-		translate(0, 30, 0);
-		cylinder(20, 60);
-		// Chapéu
-		translate(0, -30, 0);
-		sphere(60, 24, 16, 0, PI); // Metade de uma esfera
+		rotateY(PI/4);
+		// pirâmide de cima
+		push();
+		translate(0, -h/4, 0);
+		this.drawSquarePyramid(r, h/2);
+		pop();
+		// pirâmide de baixo
+		push();
+		translate(0, h/4, 0);
+		rotateX(PI);
+		this.drawSquarePyramid(r, h/2);
+		pop();
+		pop();
+	}
+
+	drawTruncatedCone(bottomR, topR, h) {
+		push();
+		let detail = 24;
+		let halfH = h / 2;
+		
+		// Superfície lateral
+		beginShape(TRIANGLE_STRIP);
+		for (let i = 0; i <= detail; i++) {
+			let angle = map(i, 0, detail, 0, TWO_PI);
+			let xTop = cos(angle) * topR;
+			let zTop = sin(angle) * topR;
+			let xBot = cos(angle) * bottomR;
+			let zBot = sin(angle) * bottomR;
+			
+			// Normal
+			let ny = (bottomR - topR) / h;
+			let nx = cos(angle);
+			let nz = sin(angle);
+			let mag = sqrt(nx*nx + ny*ny + nz*nz);
+			normal(nx/mag, ny/mag, nz/mag);
+			
+			vertex(xTop, -halfH, zTop);
+			vertex(xBot, halfH, zBot);
+		}
+		endShape();
+		
+		// Tampa superior
+		beginShape(TRIANGLE_FAN);
+		normal(0, -1, 0);
+		vertex(0, -halfH, 0);
+		for (let i = 0; i <= detail; i++) {
+			let angle = map(i, 0, detail, TWO_PI, 0);
+			vertex(cos(angle) * topR, -halfH, sin(angle) * topR);
+		}
+		endShape();
+		
+		// Tampa inferior
+		beginShape(TRIANGLE_FAN);
+		normal(0, 1, 0);
+		vertex(0, halfH, 0);
+		for (let i = 0; i <= detail; i++) {
+			let angle = map(i, 0, detail, 0, TWO_PI);
+			vertex(cos(angle) * bottomR, halfH, sin(angle) * bottomR);
+		}
+		endShape();
+		
 		pop();
 	}
 
@@ -184,15 +371,16 @@ class SecretShape {
 	}
 	
 	drawRotatePhase() {
-		// Desenha "Gire!" em 2D na frente de tudo
-		push();
-		resetMatrix();
-		ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
-		noLights(); // Garante que o texto fique sólido
-		imageMode(CENTER);
-		scale(1, -1); // Em WEBGL a imagem desenha de ponta cabeça
-		image(this.gfxGire, 0, height / 4);
-		pop();
+		// Desenha "Gire!" em 2D na frente de tudo, com fade out
+		if (this.timer < 60) {
+			push();
+			resetMatrix();
+			let alpha = map(this.timer, 0, 60, 255, 0);
+			tint(255, alpha);
+			imageMode(CENTER);
+			image(this.gfxGire, 0, -150);
+			pop();
+		}
 		
 		// Desenha o Pedestal
 		push();
@@ -213,9 +401,13 @@ class SecretShape {
 		noStroke();
 		translate(0, -50, 0);
 		
-		// Aplica a rotação do mouse
+		// Aplica a rotação do mouse (Turntable base zero)
 		rotateX(this.rotX);
 		rotateY(this.rotY);
+		
+		// Aplica a rotação base para orientar a forma
+		rotateX(this.baseRotX);
+		rotateY(this.baseRotY);
 		
 		// Configurações para silhueta perfeita preta
 		noLights(); 
@@ -226,29 +418,31 @@ class SecretShape {
 	}
 	
 	drawChoosePhase() {
-		// Desenha texto e barra de tempo em 2D
+		// Barra de tempo sincronizada com a música! (Posicionada igual WhackABump)
 		push();
 		resetMatrix();
-		ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
-		
-		noLights();
-		
-		imageMode(CENTER);
-		scale(1, -1); // Arrumar eixo Y da imagem
-		image(this.gfxEscolha, 0, height / 3);
-		scale(1, -1); // Desinverter para desenhar a barra corretamente
-		
-		// Barra de tempo sincronizada com a música!
 		let progress = 1.0;
 		if (typeof music_secretshape !== 'undefined' && music_secretshape.duration() > 0) {
 			progress = 1.0 - (music_secretshape.currentTime() / music_secretshape.duration());
 		}
-		let barW = map(progress, 0, 1, 0, 400);
+		progress = constrain(progress, 0, 1);
+		let barW = map(progress, 0, 1, 0, 600);
 		noStroke();
 		fill(255, 50, 0);
-		rect(-200, -height / 3 + 80, barW, 20, 10);
-		
+		rectMode(CORNER);
+		rect(-300, height/2 - 40, barW, 20, 10);
 		pop();
+		
+		// Texto instrucional com fade out
+		if (this.timer < 60) {
+			push();
+			resetMatrix();
+			let alpha = map(this.timer, 0, 60, 255, 0);
+			tint(255, alpha);
+			imageMode(CENTER);
+			image(this.gfxEscolha, 0, -150);
+			pop();
+		}
 		
 		// Desenha as 3 Opções lado a lado
 		let spacing = min(width / 3.5, 300);
@@ -269,9 +463,9 @@ class SecretShape {
 			push();
 			translate(0, 0, 40); // Traz a forma um pouco pra frente do painel
 			
-			// Iluminação normal do jogo
-			ambientLight(150);
-			directionalLight(255, 255, 255, 0.5, 1, -0.5);
+			// Iluminação direcional forte de um lado para criar alto contraste nas faces planas
+			ambientLight(100);
+			directionalLight(255, 255, 255, 1, 0.5, -1);
 			
 			fill(255, 200, 50); // Cor amarelada/alaranjada para destacar
 			noStroke();
@@ -279,6 +473,13 @@ class SecretShape {
 			// Leve rotação contínua para apresentação da forma
 			rotateX(globalTime * 0.01);
 			rotateY(globalTime * 0.015);
+			
+			// Aplica a rotação base para que a forma fique na pose da classe correspondente
+			let bRot = this.options[i].rotations[this.chosenClass];
+			if (bRot) {
+				rotateX(bRot.rx);
+				rotateY(bRot.ry);
+			}
 			
 			// Diminui um pouco a escala para caber bem no painel
 			scale(0.6);
@@ -303,6 +504,10 @@ class SecretShape {
 			noStroke();
 			rotateX(globalTime * 0.02);
 			rotateY(globalTime * 0.03);
+			
+			rotateX(this.baseRotX);
+			rotateY(this.baseRotY);
+			
 			scale(1.5);
 			this.correctShape.draw();
 			pop();
@@ -310,38 +515,44 @@ class SecretShape {
 			this.drawConfetti();
 			
 			// Texto
-			push();
-			resetMatrix();
-			ortho(-width/2, width/2, height/2, -height/2, 0, 1000);
-			noLights();
-			imageMode(CENTER);
-			scale(1, -1);
-			image(this.gfxCerto, 0, height/3);
-			pop();
+			if (this.timer < 60) {
+				push();
+				resetMatrix();
+				let alpha = map(this.timer, 0, 60, 255, 0);
+				tint(255, alpha);
+				imageMode(CENTER);
+				image(this.gfxCerto, 0, -150);
+				pop();
+			}
 			
 		} else {
 			// Fundo de erro
 			background(140, 190, 80);
 			
 			// Texto
-			push();
-			resetMatrix();
-			ortho(-width/2, width/2, height/2, -height/2, 0, 1000);
-			noLights();
-			imageMode(CENTER);
-			scale(1, -1);
-			image(this.gfxErrado, 0, height/3);
-			pop();
+			if (this.timer < 60) {
+				push();
+				resetMatrix();
+				let alpha = map(this.timer, 0, 60, 255, 0);
+				tint(255, alpha);
+				imageMode(CENTER);
+				image(this.gfxErrado, 0, -150);
+				pop();
+			}
 			
 			// Mostrar a forma real iluminada em cima
 			push();
 			translate(0, -100, 0);
-			ambientLight(150);
-			directionalLight(255, 255, 255, 0, 1, -1);
+			ambientLight(60);
+			directionalLight(255, 255, 255, 1, 0.5, -1);
 			fill(255, 200, 50);
 			noStroke();
 			rotateX(globalTime * 0.01);
 			rotateY(globalTime * 0.02);
+			
+			rotateX(this.baseRotX);
+			rotateY(this.baseRotY);
+			
 			this.correctShape.draw();
 			pop();
 			
@@ -349,33 +560,53 @@ class SecretShape {
 			let spacing = min(width / 3.5, 300);
 			for (let i = 0; i < 3; i++) {
 				push();
-				translate((i - 1) * spacing, 80, 0); // Levemente mais abaixo
+				translate((i - 1) * spacing, 80, 350); // Levemente mais abaixo
+				
+				// Se for a escolha errada, aplica tremor (shake)
+				if (i === this.wrongChoiceIndex) {
+					translate(random(-15, 15), random(-15, 15), 0);
+				}
 				
 				push();
-				noStroke(); ambientLight(255); fill(255);
+				noStroke(); ambientLight(255); 
+				
+				// Cor do painel
+				if (i === this.wrongChoiceIndex) {
+					fill(255, 50, 50); // Painel vermelho vivo indicando erro
+				} else if (i === this.correctIndex) {
+					let pulse = map(sin(frameCount * 0.15), -1, 1, 100, 255);
+					fill(50, pulse, 50); // Painel verde pulsante para ensinar a certa
+				} else {
+					fill(255); // Painel branco normal
+				}
+				
 				box(spacing * 0.8, spacing * 0.8, 10);
 				pop();
 				
 				push();
 				translate(0, 0, 40);
-				ambientLight(150); directionalLight(255, 255, 255, 0.5, 1, -0.5);
-				fill(255, 200, 50); noStroke();
+				ambientLight(60); directionalLight(255, 255, 255, 1, 0.5, -1);
+				
+				// Cor do objeto: escurece o errado, mantém o certo
+				if (i === this.wrongChoiceIndex) {
+					fill(100, 20, 20); // Escurece o objeto que você clicou errado
+				} else {
+					fill(255, 200, 50); 
+				}
+				
+				noStroke();
 				rotateX(globalTime * 0.01); rotateY(globalTime * 0.015);
+				
+				let bRot = this.options[i].rotations[this.chosenClass];
+				if (bRot) {
+					rotateX(bRot.rx);
+					rotateY(bRot.ry);
+				}
+				
 				scale(0.6);
 				this.options[i].draw();
 				pop();
 				
-				// X na escolha errada
-				if (i === this.wrongChoiceIndex) {
-					push();
-					translate(0, 0, 60);
-					fill(255, 0, 0); noStroke();
-					rotateZ(PI/4);
-					box(15, spacing * 0.8, 15);
-					rotateZ(PI/2);
-					box(15, spacing * 0.8, 15);
-					pop();
-				}
 				pop();
 			}
 		}
@@ -424,7 +655,10 @@ class SecretShape {
 	mouseDragged() {
 		if (this.phase === 'ROTATE') {
 			this.rotY += (mouseX - pmouseX) * 0.01;
-			this.rotX += (mouseY - pmouseY) * 0.01;
+			this.rotX -= (mouseY - pmouseY) * 0.01; // Restaura a rotação intuitiva (pitch correto)
+			
+			// Trava o eixo X para evitar o Gimbal Lock matemático (que engole o eixo Y)
+			this.rotX = constrain(this.rotX, -1.2, 1.2); 
 		}
 	}
 	

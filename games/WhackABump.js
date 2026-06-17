@@ -367,7 +367,7 @@ class WhackABump {
 		if (this.phase !== 'PLAY' || this.won) return;
 		
 		let best = null;
-		let bestD = 60; // Margem de erro do clique
+		let bestD = 30; // Margem de erro do clique
 		for (let target of this.clickTargets) {
 			// Em WebGL, mouseX e mouseY variam do canto superior esquerdo até bottom right
 			// O canvas WebGL centraliza no 0,0, então a projeção manual que fizemos mapeou com 0,0 no centro.

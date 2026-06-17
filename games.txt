@@ -1,17 +1,28 @@
 1. Forma secreta escura usando p5.js 3D, descobrir qual o objeto secreto com uma multipla escolha, 3D
 2. Superfície usando B-spline, area total de 9x9, com calos para bater como se fossem toupeiras (b-spline com 3x3) com bonk, 3D
 3. match com curvas de bezier, 2D
-4. Scan de item de mercado -> uso de normais, 3D
+
+4. Scan de item de mercado, abacaxi e caixa registradora -> uso de normais, 3D
 5. lente focal, tem que matar bichinho no chão, 2D
 6. Esfera branca e 3 opções para compor cor nesse objeto, em formato RGB (X,Y,Z)
 
+Shader da prova e encontrar o diferente
+Helicóptero atirando em balões
+Quebra cabeça de partes do tori
+Encontrar objeto numa sala escura usando luz
+Girar relógio
+Ray tracing: 2D com dois espelhos e parede
+pedra papel tesoura com mao aberta
+catmull clark, tentar imitar formato
+
+
+
 fruit ninja
-coenctar vertices
+conectar vertices
 imitar bolo
-boomenrande
+boomenrangue
 match poses
 ninja lancando dardos   
 tracing
 rotação
 preencher caminho de grafo
-édra papel tesou com mao aberta
