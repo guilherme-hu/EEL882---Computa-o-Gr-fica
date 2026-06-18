@@ -1,4 +1,4 @@
-﻿function preload() {
+function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -15,6 +15,7 @@
 	music_gameover = loadSound("audios/gameover.mp3");
 	music_insta_gameover = loadSound("audios/insta_gameover.mp3");
 	music_menu = loadSound("audios/menu.mp3"); // Instrumental da música "Recollect": https://youtu.be/IAlUCKYsI0U?si=0Ytkm9xjhfJNEiPO
+	audio_speedup = loadSound("audios/speedup.mp3");
 
 	// Voicelines de vitória e derrota com regulagem de volume individual
 	voicelines_win = [
@@ -62,6 +63,16 @@ function setup() {
 	gameOverGraphics.stroke(0); 
 	gameOverGraphics.strokeWeight(8);
 	gameOverGraphics.text("GAME OVER", 400, 100);
+
+	// Gráfico para a faixa SPEED UP
+	speedUpBannerGraphics = createGraphics(800, 200);
+	speedUpBannerGraphics.textAlign(CENTER, CENTER);
+	speedUpBannerGraphics.textSize(120);
+	speedUpBannerGraphics.textFont("'Impact', sans-serif"); 
+	speedUpBannerGraphics.fill(255); // Branco puro
+	speedUpBannerGraphics.stroke(0); 
+	speedUpBannerGraphics.strokeWeight(8);
+	speedUpBannerGraphics.text("SPEED UP!", 400, 100);
 
 	// Gráfico cacheado para as vidas (fogo)
 	lifeGraphics = createGraphics(160, 160);
@@ -166,6 +177,13 @@ function keyPressed() {
 			vidas = 4; 
 		}
 	}
+	
+	// K para ganhar vida (limite de 4 para manter a interface correta)
+	if (key === 'k' || key === 'K') {
+		if (vidas < 4) {
+			vidas++;
+		}
+	}
 }
 
 function mouseDragged() {
@@ -236,7 +254,7 @@ function loseMicrogame() {
 
 function draw() {
 	// Calcula o Delta Time (1.0 = rodando perfeitamente a 60FPS. 2.0 = rodando a 30FPS)
-	dt = Math.min(deltaTime, 100) / (1000 / 60);
+	dt = (Math.min(deltaTime, 100) / (1000 / 60)) * globalSpeedMultiplier;
 	globalTime += dt;
 
 	if (shipIntroTimer > 0) {
@@ -261,7 +279,7 @@ function draw() {
 			}
 		}
 	}
-	shaderTime += (deltaTime / 1000.0) * timeMultiplier;
+	shaderTime += (deltaTime / 1000.0) * timeMultiplier * globalSpeedMultiplier;
 
 	// Atualiza o FPS apenas a cada 10 frames para evitar reflow no navegador
 	if (typeof fpsDiv !== 'undefined' && fpsDiv && frameCount % 10 === 0) {
@@ -307,10 +325,49 @@ function draw() {
 		drawHubScene(); // Fundo + nave sempre visíveis no start, jogo em si e gameover
 		
 		if (currentState === GameState.HUB) {
-			hubTimer += dt;
-			if (hubTimer > 45) {
-				currentState = GameState.TRANSITION;
-				instructionText = "Mouse"; 
+			if (isSpeedingUp) {
+				// Evento de Speed Up!
+				push();
+				resetMatrix();
+				ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
+				noLights();
+				
+				// Faixa horizontal que pulsa
+				let pulse = 1.0 + sin(frameCount * 0.2) * 0.1;
+				translate(0, 0, 500); // Traz para a frente da nave
+				imageMode(CENTER);
+				scale(1, -1); // Inverte Y
+				scale(pulse);
+				
+				if (speedUpBannerGraphics) {
+					image(speedUpBannerGraphics, 0, 0);
+				}
+				pop();
+				
+				// Checa se a música de speed up acabou
+				if (audio_speedup && !audio_speedup.isPlaying()) {
+					isSpeedingUp = false;
+					globalSpeedMultiplier *= 1.1;
+					updateAudioRates(); // Atualiza a velocidade das músicas
+					lastSpeedUpScore = score;
+					
+					if (music_normal && !music_normal.isPlaying()) {
+						music_normal.play();
+					}
+				}
+			} else {
+				// Verifica se precisa engatilhar o speed up (após voltar de um minigame onde o score ficou múltiplo de 5)
+				if (score > 0 && score % 5 === 0 && lastSpeedUpScore !== score) {
+					isSpeedingUp = true;
+					if (music_normal && music_normal.isPlaying()) music_normal.pause();
+					if (audio_speedup) audio_speedup.play();
+				} else {
+					hubTimer += dt;
+					if (hubTimer > 45) {
+						currentState = GameState.TRANSITION;
+						instructionText = "Mouse"; 
+					}
+				}
 			}
 		}
 	} else if (currentState === GameState.TRANSITION) {
@@ -379,5 +436,22 @@ function draw() {
 		if (hubTimer > 60 && audioDone) {
 			triggerGameOver();
 		}
+	}
+}
+
+function updateAudioRates() {
+	let r = globalSpeedMultiplier;
+	if (music_normal) music_normal.rate(r);
+	if (music_vitoria) music_vitoria.rate(r);
+	if (music_derrota) music_derrota.rate(r);
+	if (typeof music_secretshape !== 'undefined') music_secretshape.rate(r);
+	if (typeof audio_beziermatch !== 'undefined') audio_beziermatch.rate(r);
+	if (typeof audio_bonk !== 'undefined') audio_bonk.rate(r);
+	if (typeof audio_speedup !== 'undefined' && audio_speedup) audio_speedup.rate(r);
+	if (voicelines_win) {
+		for (let vl of voicelines_win) vl.sound.rate(r);
+	}
+	if (voicelines_lose) {
+		for (let vl of voicelines_lose) vl.sound.rate(r);
 	}
 }

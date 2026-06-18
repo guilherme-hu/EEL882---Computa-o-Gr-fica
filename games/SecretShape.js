@@ -421,10 +421,7 @@ class SecretShape {
 		// Barra de tempo sincronizada com a música! (Posicionada igual WhackABump)
 		push();
 		resetMatrix();
-		let progress = 1.0;
-		if (typeof music_secretshape !== 'undefined' && music_secretshape.duration() > 0) {
-			progress = 1.0 - (music_secretshape.currentTime() / music_secretshape.duration());
-		}
+		let progress = 1.0 - (this.timer / this.durationChoose);
 		progress = constrain(progress, 0, 1);
 		let barW = map(progress, 0, 1, 0, 600);
 		noStroke();
@@ -574,7 +571,7 @@ class SecretShape {
 				if (i === this.wrongChoiceIndex) {
 					fill(255, 50, 50); // Painel vermelho vivo indicando erro
 				} else if (i === this.correctIndex) {
-					let pulse = map(sin(frameCount * 0.15), -1, 1, 100, 255);
+					let pulse = map(sin(globalTime * 0.15), -1, 1, 100, 255);
 					fill(50, pulse, 50); // Painel verde pulsante para ensinar a certa
 				} else {
 					fill(255); // Painel branco normal

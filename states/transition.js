@@ -25,14 +25,13 @@ function drawTransitionPhase() {
 		animScale = 0;
 	}
 
-	// Momento exato em que a placa termina de sumir: incrementa pontuação e vai para Microgame
 	if (prevTimer <= 135 && hubTimer > 135) {
 		score++;
 		if (phaseDiv) {
 			phaseDiv.style('transform', 'scale(1.5)');
 			setTimeout(() => {
 				if (phaseDiv) phaseDiv.style('transform', 'scale(1)');
-			}, 800);
+			}, 800 / globalSpeedMultiplier);
 		}
 	}
 
@@ -141,7 +140,7 @@ function drawIris(progress, cx = 0, cy = 0, useShader = false) {
 	if (useShader && typeof my_shader !== 'undefined' && !performanceMode) {
 		shader(my_shader);
 		my_shader.setUniform('iResolution', [width, height]);
-		my_shader.setUniform('iTime', millis() / 1000.0);
+		my_shader.setUniform('iTime', shaderTime);
 	} else {
 		noLights();
 		fill(0); 

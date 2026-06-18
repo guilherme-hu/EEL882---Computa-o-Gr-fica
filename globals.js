@@ -70,3 +70,10 @@ let fpsHistory = [];
 let bgBuffer; 			// Buffer para o plano de fundo no modo desempenho 1
 const bgScale = 0.4;  	// Escala para o buffer de fundo (40% da resolução original)
 let bgShader; 			// Cópia do shader para o plano de fundo
+
+// Speed Up Variables
+let globalSpeedMultiplier = 1.0; // velocidade global inicial
+let isSpeedingUp = false;
+let lastSpeedUpScore = 0;
+let speedUpBannerGraphics;
+let audio_speedup;

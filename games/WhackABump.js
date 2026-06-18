@@ -190,8 +190,11 @@ class WhackABump {
 			else loseMicrogame();
 		}
 		
-		// Spawn do 3º galo (Galo surpresa) em 2 segundos
-		if (this.timer > 120 && !this.surpriseSpawned && this.phase === 'PLAY') {
+		// Spawn do 3º galo (Galo surpresa) dependente da aceleração do jogo
+		let baseSpawnTime = 120; // valor base em 'unidades de timer'
+		let speedMult = (typeof globalSpeedMultiplier !== 'undefined') ? globalSpeedMultiplier : 1.0;
+		let effectiveSpawnTime = baseSpawnTime / Math.max(speedMult, 0.01);
+		if (this.timer > effectiveSpawnTime && !this.surpriseSpawned && this.phase === 'PLAY') {
 			this.surpriseSpawned = true;
 			let spawned = false;
 			let attempts = 0;

@@ -213,7 +213,7 @@ function drawArwing(activeLives = 4) {
             // 4 pequenos losangos que formam o rastro do jato
             for (let i = 0; i < 4; i++) {
                 // Um temporizador cíclico de 0 a 20 para cada partícula, espaçadas uniformemente
-                let t = (frameCount * 0.8 + i * 5) % 20; 
+                let t = (globalTime * 0.8 + i * 5) % 20; 
                 
                 // Mapeia a distância (0 a 30 pra trás) e o tamanho (encolhe de 5 para 0)
                 let distance = map(t, 0, 20, 0, 30);
@@ -223,9 +223,9 @@ function drawArwing(activeLives = 4) {
                 translate(0, 0, -distance);
                 
                 // Gira em todos os eixos para o cubo parecer uma faísca facetada
-                rotateX(frameCount * 0.1 + i);
-                rotateY(frameCount * 0.2 + i);
-                rotateZ(frameCount * 0.3 + i);
+                rotateX(globalTime * 0.1 + i);
+                rotateY(globalTime * 0.2 + i);
+                rotateZ(globalTime * 0.3 + i);
                 
                 // Se a partícula estiver logo no começo (perto do motor), ela é mais quente (amarela)
                 if (t < 6) {

@@ -130,6 +130,13 @@ function retryGame() {
 	if (typeof music_gameover !== 'undefined' && music_gameover.isPlaying()) {
 		music_gameover.stop();
 	}
+	
+	// Reseta Speed Up
+	globalSpeedMultiplier = 1.0;
+	lastSpeedUpScore = 0;
+	isSpeedingUp = false;
+	if (typeof updateAudioRates === 'function') updateAudioRates();
+
 	if (music_normal && !music_normal.isPlaying()) {
 		music_normal.play();
 	}
@@ -159,4 +166,11 @@ function quitGame() {
 	if (typeof music_menu !== 'undefined' && !music_menu.isPlaying()) {
 		music_menu.loop();
 	}
+	
+	// Reseta Speed Up
+	globalSpeedMultiplier = 1.0;
+	lastSpeedUpScore = 0;
+	isSpeedingUp = false;
+	if (typeof updateAudioRates === 'function') updateAudioRates();
 }
+
