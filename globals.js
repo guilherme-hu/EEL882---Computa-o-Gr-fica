@@ -58,7 +58,11 @@ let music_menu;
 
 let voicelines_win = [];
 let voicelines_lose = [];
-let enableVoicelines = false; // Hardcoded: trocar para false para desativar as vozes de comemoração e derrota
+let enableVoicelines = true; // Hardcoded: trocar para false para desativar as vozes de comemoração e derrota
+let voicelineWinPool = [];
+let voicelineLosePool = [];
+let lastWinVoicelineIndex = -1;
+let lastLoseVoicelineIndex = -1;
 
 // Modo Desempenho
 // 0 = Shader Resolução Máxima, 1 = Shader Resolução Baixa (Buffer), 2 = Imagem Estática

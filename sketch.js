@@ -1,4 +1,4 @@
-function preload() {
+﻿function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -19,15 +19,19 @@ function preload() {
 
 	// Voicelines de vitória e derrota com regulagem de volume individual
 	voicelines_win = [
-		{ sound: loadSound("audios/voicelines/hehehe.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/yipeee.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/yayy.mp3"), vol: 1.0 }
+		{ sound: loadSound("audios/voicelines/etacomoebom.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/lessgo.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/nice.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/uhul.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/yayy.mp3"), vol: 1.0 },
 	];
 
 	voicelines_lose = [
-		{ sound: loadSound("audios/voicelines/bruh.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/clash_cry.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/nah.mp3"), vol: 1.0 }
+		{ sound: loadSound("audios/voicelines/ahmano.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/meudeus.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/nao.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/ohno.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/uque.mp3"), vol: 2.0 },
 	];
 
 	// Load de imagens
@@ -227,10 +231,21 @@ function winMicrogame() {
 	if (music_vitoria) music_vitoria.play();
 }
 
+// Variáveis para evitar repetição consecutiva de áudio
+let lastWinVl = null;
+let lastLoseVl = null;
+
 // Toca a voiceline assim que a condição de vitória é atingida dentro do minigame
 function playWinVoiceline() {
 	if (enableVoicelines && !isMuted && voicelines_win && voicelines_win.length > 0) {
 		let vl = random(voicelines_win);
+		// Previne repetição imediata se houver mais de 1 opção
+		if (voicelines_win.length > 1) {
+			while (vl === lastWinVl) {
+				vl = random(voicelines_win);
+			}
+		}
+		lastWinVl = vl;
 		vl.sound.setVolume(vl.vol);
 		vl.sound.play();
 	}
@@ -247,6 +262,13 @@ function loseMicrogame() {
 	// Toca uma voiceline aleatória de derrota
 	if (enableVoicelines && !isMuted && voicelines_lose.length > 0) {
 		let vl = random(voicelines_lose);
+		// Previne repetição imediata
+		if (voicelines_lose.length > 1) {
+			while (vl === lastLoseVl) {
+				vl = random(voicelines_lose);
+			}
+		}
+		lastLoseVl = vl;
 		vl.sound.setVolume(vl.vol);
 		vl.sound.play();
 	}
