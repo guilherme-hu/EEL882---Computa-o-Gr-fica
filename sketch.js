@@ -25,24 +25,24 @@
 	// Voicelines de vitória e derrota
 	// Agradecimentos a minha irmã Shoga, Celeste e Betão
 	voicelines_win = [
-		{ sound: loadSound("audios/voicelines/etacomoebom.mp3"), vol: 2.0 },
+		// { sound: loadSound("audios/voicelines/etacomoebom.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/lessgo.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/nice.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/uhul.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/yayy.mp3"), vol: 1.0 },
-		{ sound: loadSound("audios/voicelines/queaura.mp3"), vol: 2.0 },
+		// { sound: loadSound("audios/voicelines/queaura.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/wahaa.mp3"), vol: 2.0 },
 	];
 
 	voicelines_lose = [
 		{ sound: loadSound("audios/voicelines/ahmano.mp3"), vol: 2.0 },
-		{ sound: loadSound("audios/voicelines/meudeus.mp3"), vol: 2.0 },
+		// { sound: loadSound("audios/voicelines/meudeus.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/nao.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/ohno.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/uque.mp3"), vol: 2.0 },
-		{ sound: loadSound("audios/voicelines/comoassim.mp3"), vol: 2.0 },
+		// { sound: loadSound("audios/voicelines/comoassim.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/gah.mp3"), vol: 2.0 },
-		{ sound: loadSound("audios/voicelines/queisso.mp3"), vol: 2.0 },
+		// { sound: loadSound("audios/voicelines/queisso.mp3"), vol: 2.0 },
 	];
 
 	// Load de imagens
@@ -168,14 +168,14 @@ function keyPressed() {
 		togglePause();
 	}
 	
-	// Alterna o Modo Desempenho entre os 3 níveis a qualquer momento apertando 'N'
-	if (key === 'n' || key === 'N') {
+	// Alterna o Modo Desempenho entre os 3 níveis a qualquer momento apertando 'B'
+	if (key === 'b' || key === 'B') {
 		performanceMode = (performanceMode + 1) % 3; // Cicla entre 0, 1 e 2
 		
 		// Se a tela de aviso ainda estiver aberta, fecha ela
 		if (typeof warningOverlay !== 'undefined' && warningOverlay && warningOverlay.style('display') !== 'none') {
 			warningOverlay.style('display', 'none');
-			// Toca a música do menu se não estiver tocando caso jogador use N para tirar aviso
+			// Toca a música do menu se não estiver tocando caso jogador use B para tirar aviso
 			if (typeof music_menu !== 'undefined' && !music_menu.isPlaying()) {
 				music_menu.loop();
 				music_menu.setVolume(0.6);
@@ -183,8 +183,14 @@ function keyPressed() {
 		}
 		return; 
 	}
+	
+	// Atalho para mutar os voicelines do jogo (N)
+	if (key === 'n' || key === 'N') {
+		enableVoicelines = !enableVoicelines;
+		return;
+	}
 
-	// Se houver overlay e não for 'N', ignora outros atalhos até fechar
+	// Se houver overlay e não for 'B', ignora outros atalhos até fechar
 	if (typeof warningOverlay !== 'undefined' && warningOverlay && warningOverlay.style('display') !== 'none') {
 		return; 
 	}

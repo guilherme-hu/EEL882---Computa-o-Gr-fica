@@ -75,7 +75,7 @@ function setupStartUI() {
 	warningTitle.style('margin-bottom', '20px');
 
 	// Texto do aviso
-	let warningText = createDiv('Este jogo utiliza gráficos pesados por conta das animações e efeitos visuais. Se você notar que o jogo está travando, temos um Modo Desempenho para melhorar a jogabilidade.<br><br>Pressione <b>"N"</b> para <b>trocar de Modo Desempenho (temos um total de 3 opções), ele diminuirá a resolução do Raymarching de fundo</b>.<br><br>Clique em qualquer lugar da tela para fechar o aviso.');
+	let warningText = createDiv('Este jogo utiliza gráficos pesados por conta das animações e efeitos visuais. Se você notar que o jogo está travando, pressione <b>"B"</b> para <b>trocar de Modo Desempenho (temos um total de 3 opções), ele diminuirá a resolução do Raymarching de fundo</b>.<br><br>Clique em qualquer lugar da tela para fechar o aviso.');
 	warningText.parent(warningBox);
 	warningText.style('color', '#fff');
 	warningText.style('font-size', '18px');
