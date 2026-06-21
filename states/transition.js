@@ -115,6 +115,12 @@ function drawTransitionPhase() {
 			if (music_normal) music_normal.pause();
 		} else if (nextGameName === 'WhackABump') {
 			if (music_normal) music_normal.pause();
+		} else if (nextGameName === 'ClockMatch' && typeof music_clockmatch !== 'undefined') {
+			music_clockmatch.play();
+			if (music_normal) music_normal.pause();
+		} else if (nextGameName === 'LaserMirror' && typeof music_lasermirror !== 'undefined') {
+			music_lasermirror.play();
+			if (music_normal) music_normal.pause();
 		}
 		
 		if (nextGameName === 'SecretShape') {
@@ -123,6 +129,10 @@ function drawTransitionPhase() {
 			currentMicrogame = new BezierMatch();
 		} else if (nextGameName === 'WhackABump') {
 			currentMicrogame = new WhackABump();
+		} else if (nextGameName === 'ClockMatch') {
+			currentMicrogame = new ClockMatch();
+		} else if (nextGameName === 'LaserMirror') {
+			currentMicrogame = new LaserMirror();
 		} else {
 			// Dummy temporário para não dar crash se a classe ainda não existir
 			currentMicrogame = { draw: () => { background(50); fill(255); textSize(32); text("Microgame Dummy (Implementar!)", 0, 0); }, mousePressed: () => {}, mouseDragged: () => {} }; 

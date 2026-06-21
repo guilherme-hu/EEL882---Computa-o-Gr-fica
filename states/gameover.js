@@ -173,4 +173,3 @@ function quitGame() {
 	isSpeedingUp = false;
 	if (typeof updateAudioRates === 'function') updateAudioRates();
 }
-

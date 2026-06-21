@@ -10,6 +10,8 @@
 	music_vitoria = loadSound("audios/orbulon_vit.mp3");
 	music_derrota = loadSound("audios/orbulon_der.mp3");
 	music_secretshape = loadSound("audios/secret_shape.mp3");
+	music_clockmatch = loadSound("audios/clockmatch.mp3");
+	music_lasermirror = loadSound("audios/laser.mp3");
 	audio_beziermatch = loadSound("audios/bezier_match.mp3");
 	audio_bonk = loadSound("audios/bonk.mp3");
 	music_gameover = loadSound("audios/gameover.mp3");
@@ -228,6 +230,8 @@ function winMicrogame() {
 	hubTimer = 0;
 	if (music_normal && music_normal.isPlaying()) music_normal.pause();
 	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
 	if (music_vitoria) music_vitoria.play();
 }
 
@@ -257,6 +261,8 @@ function loseMicrogame() {
 	hubTimer = 0;
 	if (music_normal && music_normal.isPlaying()) music_normal.pause();
 	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
 	performExplosion();
 	
 	// Toca uma voiceline aleatória de derrota
@@ -469,6 +475,8 @@ function updateAudioRates() {
 	if (typeof music_secretshape !== 'undefined') music_secretshape.rate(r);
 	if (typeof audio_beziermatch !== 'undefined') audio_beziermatch.rate(r);
 	if (typeof audio_bonk !== 'undefined') audio_bonk.rate(r);
+	if (music_clockmatch) music_clockmatch.rate(r);
+	if (music_lasermirror) music_lasermirror.rate(r);
 	if (typeof audio_speedup !== 'undefined' && audio_speedup) audio_speedup.rate(r);
 	if (voicelines_win) {
 		for (let vl of voicelines_win) vl.sound.rate(r);

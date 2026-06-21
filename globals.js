@@ -29,7 +29,7 @@ let highscores = [];
 let vidas = 4;
 let explosions = [];
 let currentMicrogame = null;
-let allMicrogames = ['SecretShape', 'BezierMatch', 'WhackABump'];
+let allMicrogames = ['SecretShape', 'BezierMatch', 'WhackABump', 'ClockMatch', 'LaserMirror'];
 let availableMicrogames = [];
 let hubTimer = 0;
 let globalTime = 0; // Tempo independente de FPS
@@ -50,6 +50,8 @@ let music_normal;
 let music_vitoria;
 let music_derrota;
 let music_secretshape;
+let music_clockmatch;
+let music_lasermirror;
 let audio_beziermatch;
 let audio_bonk;
 let music_gameover;
