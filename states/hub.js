@@ -268,6 +268,6 @@ function performExplosion() {
 		
 		explosions.push({ x: ex, y: ey, z: ez, frameStart: globalTime, life: 35, debris: debris });
 		vidas--;
-		if (music_derrota) music_derrota.play();
+		
 	}
 }

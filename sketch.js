@@ -254,10 +254,14 @@ function winMicrogame() {
 	lastResultStatus = 'WIN';
 	currentState = GameState.RESULT;
 	hubTimer = 0;
+
+	// Verificação de segurança de audios + audio de vitoria
 	if (music_normal && music_normal.isPlaying()) music_normal.pause();
 	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
 	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
 	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.pause();
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.pause();
 	if (music_vitoria) music_vitoria.play();
 }
 
@@ -285,12 +289,19 @@ function loseMicrogame() {
 	lastResultStatus = 'LOSE';
 	currentState = GameState.RESULT;
 	hubTimer = 0;
+
+	// Verificação de segurança de audios + audio de derrota
 	if (music_normal && music_normal.isPlaying()) music_normal.pause();
 	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
 	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
 	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.pause();
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.pause();
+	if (music_derrota) music_derrota.play();
+
+	// Explode turbina e perda vida
 	performExplosion();
-	
+
 	// Toca uma voiceline aleatória de derrota
 	if (enableVoicelines && !isMuted && voicelines_lose.length > 0) {
 		let vl = random(voicelines_lose);

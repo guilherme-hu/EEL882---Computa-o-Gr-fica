@@ -77,8 +77,23 @@ function triggerGameOver() {
 	if (phaseDiv) phaseDiv.style('display', 'none');
 	
 	if (music_normal && music_normal.isPlaying()) {
-		music_normal.pause();
+		music_normal.stop();
 	}
+	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) {
+		music_secretshape.stop();
+	}
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) {
+		music_clockmatch.stop();
+	}
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) {
+		music_lasermirror.stop();
+	}
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) {
+		audio_beziermatch.stop();
+	}
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) {
+		audio_bonk.stop();
+	}	
 	
 	if (typeof music_gameover !== 'undefined' && !music_gameover.isPlaying()) {
 		music_gameover.loop();
@@ -127,9 +142,29 @@ function retryGame() {
 	gameOverContainer.style('opacity', '0');
 	gameOverContainer.hide();
 	currentState = GameState.HUB;
+	
+	// Áudios parados
 	if (typeof music_gameover !== 'undefined' && music_gameover.isPlaying()) {
 		music_gameover.stop();
 	}
+	if (music_normal && music_normal.isPlaying()) {
+		music_normal.stop();
+	}
+	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) {
+		music_secretshape.stop();
+	}
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) {
+		music_clockmatch.stop();
+	}
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) {
+		music_lasermirror.stop();
+	}
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) {
+		audio_beziermatch.stop();
+	}
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) {
+		audio_bonk.stop();
+	}	
 	
 	// Reseta Speed Up
 	globalSpeedMultiplier = 1.0;
@@ -155,12 +190,29 @@ function quitGame() {
 	if (startButton) startButton.show();
 	let titleEl = document.getElementById('gameTitle');
 	if (titleEl) titleEl.style.display = 'block';
+	
+	// Áudios parados
 	if (typeof music_gameover !== 'undefined' && music_gameover.isPlaying()) {
 		music_gameover.stop();
 	}
 	if (music_normal && music_normal.isPlaying()) {
-		music_normal.pause();
+		music_normal.stop();
 	}
+	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) {
+		music_secretshape.stop();
+	}
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) {
+		music_clockmatch.stop();
+	}
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) {
+		music_lasermirror.stop();
+	}
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) {
+		audio_beziermatch.stop();
+	}
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) {
+		audio_bonk.stop();
+	}	
 	
 	// Volta a tocar a música do menu principal
 	if (typeof music_menu !== 'undefined' && !music_menu.isPlaying()) {
