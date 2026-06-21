@@ -52,10 +52,22 @@ class WhackABump {
 		this.gfxText.textSize(120);
 		this.gfxText.textStyle(NORMAL);
 		this.gfxText.text("ESMAGUE!", 400, 100);
+		this.gfxText.text("ESMAGUE!", 400, 100);
 		
 		if (typeof audio_bonk !== 'undefined' && audio_bonk) {
 			audio_bonk.setVolume(1.0);
 			audio_bonk.play();
+			
+			if (typeof audio_ai !== 'undefined' && audio_ai && audio_ou && audio_ui) {
+				this.hitSounds = [audio_ai, audio_ou, audio_ui];
+				// Embaralha o array para que as 3 batidas toquem em ordem aleatória
+				for (let i = this.hitSounds.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[this.hitSounds[i], this.hitSounds[j]] = [this.hitSounds[j], this.hitSounds[i]];
+				}
+			}
+		} else {
+			this.hitSounds = [];
 		}
 	}
 	
@@ -401,6 +413,12 @@ class WhackABump {
 					rot: 0,
 					rotSpeed: 0.1
 				});
+			}
+			if (this.hitSounds && this.hitSounds.length > 0) {
+				let snd = this.hitSounds.pop();
+				if (snd && snd.isLoaded()) {
+					snd.play();
+				}
 			}
 		}
 	}

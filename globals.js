@@ -57,6 +57,9 @@ let audio_bonk;
 let music_gameover;
 let music_insta_gameover;
 let music_menu;
+let audio_ai;
+let audio_ou;
+let audio_ui;
 
 let voicelines_win = [];
 let voicelines_lose = [];

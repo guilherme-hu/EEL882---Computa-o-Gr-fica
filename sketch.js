@@ -1,4 +1,4 @@
-﻿function preload() {
+function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -18,14 +18,20 @@
 	music_insta_gameover = loadSound("audios/insta_gameover.mp3");
 	music_menu = loadSound("audios/menu.mp3"); // Instrumental da música "Recollect": https://youtu.be/IAlUCKYsI0U?si=0Ytkm9xjhfJNEiPO
 	audio_speedup = loadSound("audios/speedup.mp3");
+	audio_ai = loadSound("audios/ai.mp3");
+	audio_ou = loadSound("audios/ou.mp3");
+	audio_ui = loadSound("audios/ui.mp3");
 
-	// Voicelines de vitória e derrota com regulagem de volume individual
+	// Voicelines de vitória e derrota
+	// Agradecimentos à Shoga, Celeste e Betão
 	voicelines_win = [
 		{ sound: loadSound("audios/voicelines/etacomoebom.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/lessgo.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/nice.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/uhul.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/yayy.mp3"), vol: 1.0 },
+		{ sound: loadSound("audios/voicelines/queaura.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/wahaa.mp3"), vol: 2.0 },
 	];
 
 	voicelines_lose = [
@@ -34,6 +40,9 @@
 		{ sound: loadSound("audios/voicelines/nao.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/ohno.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/uque.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/comoassim.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/gah.mp3"), vol: 2.0 },
+		{ sound: loadSound("audios/voicelines/queisso.mp3"), vol: 2.0 },
 	];
 
 	// Load de imagens
@@ -484,4 +493,7 @@ function updateAudioRates() {
 	if (voicelines_lose) {
 		for (let vl of voicelines_lose) vl.sound.rate(r);
 	}
+	if (typeof audio_ai !== 'undefined' && audio_ai) audio_ai.rate(r);
+	if (typeof audio_ou !== 'undefined' && audio_ou) audio_ou.rate(r);
+	if (typeof audio_ui !== 'undefined' && audio_ui) audio_ui.rate(r);	
 }
