@@ -48,8 +48,16 @@ class LaserMirror {
 			let vE_M1 = p5.Vector.sub(p_m1, p_emitter);
 			this.emitter = { x: p_emitter.x, y: p_emitter.y, angle: vE_M1.heading() };
 			
-			this.mirrors.push({ x: p_m1.x, y: p_m1.y, angle: random(TWO_PI), length: 140 });
-			this.mirrors.push({ x: p_m2.x, y: p_m2.y, angle: random(TWO_PI), length: 140 });
+			this.mirrors.push({ x: p_m1.x, y: p_m1.y, angle: random(TWO_PI), length: 180 });
+			this.mirrors.push({ x: p_m2.x, y: p_m2.y, angle: random(TWO_PI), length: 180 });
+			
+			if (random() > 0.5) {
+				let p_fake = randomPoint(p_emitter, 150, 300);
+				this.mirrors.push({
+					x: p_fake.x, y: p_fake.y, 
+					angle: random(TWO_PI), length: 180 
+				});
+			}
 			
 			// Centraliza o cenário no meio da tela ANTES de criar as paredes
 			let cxSum = this.target.x + this.emitter.x;
@@ -243,6 +251,7 @@ class LaserMirror {
 		
 		if (closestDist < 200) { // Hitbox bem maior (200px)
 			this.selectedMirror = closestM;
+			this.lastMouseAngle = atan2(my - closestM.y, mx - closestM.x);
 		}
 	}
 	
@@ -253,8 +262,16 @@ class LaserMirror {
 			let mx = mouseX - cx;
 			let my = mouseY - cy;
 			
-			// Rotaciona o espelho para apontar na direção do mouse
-			this.selectedMirror.angle = atan2(my - this.selectedMirror.y, mx - this.selectedMirror.x);
+			let currentMouseAngle = atan2(my - this.selectedMirror.y, mx - this.selectedMirror.x);
+			let deltaAngle = currentMouseAngle - this.lastMouseAngle;
+			
+			// Lida com a quebra angular do atan2 de -PI para PI
+			if (deltaAngle > PI) deltaAngle -= TWO_PI;
+			if (deltaAngle < -PI) deltaAngle += TWO_PI;
+			
+			// Rotaciona o espelho proporcionalmente com uma taxa de 0.35 para maior precisão!
+			this.selectedMirror.angle += deltaAngle * 0.35;
+			this.lastMouseAngle = currentMouseAngle;
 		}
 	}
 	

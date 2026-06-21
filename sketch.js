@@ -256,12 +256,12 @@ function winMicrogame() {
 	hubTimer = 0;
 
 	// Verificação de segurança de audios + audio de vitoria
-	if (music_normal && music_normal.isPlaying()) music_normal.pause();
-	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
-	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
-	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
-	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.pause();
-	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.pause();
+	if (music_normal && music_normal.isPlaying()) music_normal.stop();
+	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.stop();
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.stop();
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.stop();
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.stop();
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.stop();
 	if (music_vitoria) music_vitoria.play();
 }
 
@@ -291,12 +291,12 @@ function loseMicrogame() {
 	hubTimer = 0;
 
 	// Verificação de segurança de audios + audio de derrota
-	if (music_normal && music_normal.isPlaying()) music_normal.pause();
-	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.pause();
-	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.pause();
-	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.pause();
-	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.pause();
-	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.pause();
+	if (music_normal && music_normal.isPlaying()) music_normal.stop();
+	if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) music_secretshape.stop();
+	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.stop();
+	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.stop();
+	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.stop();
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.stop();
 	if (music_derrota) music_derrota.play();
 
 	// Explode turbina e perda vida
@@ -319,6 +319,7 @@ function loseMicrogame() {
 
 function draw() {
 	// Calcula o Delta Time (1.0 = rodando perfeitamente a 60FPS. 2.0 = rodando a 30FPS)
+	// Serve para acelerar o jogo pelos Speed Ups + controle de tempo independente do FPS
 	dt = (Math.min(deltaTime, 100) / (1000 / 60)) * globalSpeedMultiplier;
 	globalTime += dt;
 

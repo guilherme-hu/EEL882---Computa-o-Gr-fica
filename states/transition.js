@@ -39,52 +39,52 @@ function drawTransitionPhase() {
 	resetMatrix();
 	ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
 
-	// Placa de Instrução
-	if (animScale > 0) {
-		push();
-		translate(0, height * 0.1, 500); 
-		scale(animScale);
+	// // Placa de Instrução
+	// if (animScale > 0) {
+	// 	push();
+	// 	translate(0, height * 0.1, 500); 
+	// 	scale(animScale);
 		
-		// Fundo da placa 
-		rectMode(CENTER);
-		fill(255); 
-		stroke(0);
-		strokeWeight(10);
-		rect(0, 0, 400, 300); 
+	// 	// Fundo da placa 
+	// 	rectMode(CENTER);
+	// 	fill(255); 
+	// 	stroke(0);
+	// 	strokeWeight(10);
+	// 	rect(0, 0, 400, 300); 
 		
-		// Desenho do ícone do mouse
-		push();
-		translate(0, -40); // Move para o centro da placa
-		scale(1, -1);      // Desinverte para desenhar direito
-		strokeWeight(4);
-		stroke(0);
+	// 	// Desenho do ícone do mouse
+	// 	push();
+	// 	translate(0, -40); // Move para o centro da placa
+	// 	scale(1, -1);      // Desinverte para desenhar direito
+	// 	strokeWeight(4);
+	// 	stroke(0);
 		
-		// Fio do mouse
-		line(0, -60, 0, -100);
+	// 	// Fio do mouse
+	// 	line(0, -60, 0, -100);
 		
-		// Corpo do mouse (Oval simples)
-		fill(200);
-		ellipse(0, 0, 80, 120);
+	// 	// Corpo do mouse (Oval simples)
+	// 	fill(200);
+	// 	ellipse(0, 0, 80, 120);
 		
-		// Linhas separadoras dos botões e do fio
-		line(0, -60, 0, -10);
-		line(-38, -10, 38, -10);
+	// 	// Linhas separadoras dos botões e do fio
+	// 	line(0, -60, 0, -10);
+	// 	line(-38, -10, 38, -10);
 		
-		// Scroll
-		fill(50);
-		rectMode(CENTER);
-		rect(0, -25, 8, 20); 
-		pop();
+	// 	// Scroll
+	// 	fill(50);
+	// 	rectMode(CENTER);
+	// 	rect(0, -25, 8, 20); 
+	// 	pop();
 		
-		// Renderiza o texto gerado via p5.Graphics
-		push();
-		imageMode(CENTER);
-		scale(1, -1);
-		image(textGraphics, 0, -100); 
-		pop();
+	// 	// Renderiza o texto gerado via p5.Graphics
+	// 	push();
+	// 	imageMode(CENTER);
+	// 	scale(1, -1);
+	// 	image(textGraphics, 0, -100); 
+	// 	pop();
 
-		pop();
-	}
+	// 	pop();
+	// }
 	
 	pop();
 
