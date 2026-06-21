@@ -1,4 +1,4 @@
-function preload() {
+﻿function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -23,7 +23,7 @@ function preload() {
 	audio_ui = loadSound("audios/ui.mp3");
 
 	// Voicelines de vitória e derrota
-	// Agradecimentos à Shoga, Celeste e Betão
+	// Agradecimentos a minha irmã Shoga, Celeste e Betão
 	voicelines_win = [
 		{ sound: loadSound("audios/voicelines/etacomoebom.mp3"), vol: 2.0 },
 		{ sound: loadSound("audios/voicelines/lessgo.mp3"), vol: 2.0 },
@@ -131,6 +131,8 @@ function setup() {
 	phaseDiv.style('pointer-events', 'none');
 	phaseDiv.style('display', 'none');
 	phaseDiv.style('transition', 'transform 0.25s ease-out'); 
+	
+	// Configurações das interfaces de cada estado
 	setupStartUI();
 	setupGameOverUI();
 	setupPauseUI();
@@ -151,6 +153,12 @@ function windowResized() {
 	}
 	if (gameOverContainer) {
 		gameOverContainer.size(windowWidth, windowHeight);
+	}
+	if (pauseContainer) {
+		pauseContainer.size(windowWidth, windowHeight);
+	}
+	if (phaseDiv) {
+		phaseDiv.style('width', `${windowWidth}px`);
 	}
 }
 
