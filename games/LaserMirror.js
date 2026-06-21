@@ -269,8 +269,8 @@ class LaserMirror {
 			if (deltaAngle > PI) deltaAngle -= TWO_PI;
 			if (deltaAngle < -PI) deltaAngle += TWO_PI;
 			
-			// Rotaciona o espelho proporcionalmente com uma taxa de 0.35 para maior precisão!
-			this.selectedMirror.angle += deltaAngle * 0.35;
+			// Rotaciona o espelho proporcionalmente com uma taxa de 0.5 para maior precisão!
+			this.selectedMirror.angle += deltaAngle * 0.5;
 			this.lastMouseAngle = currentMouseAngle;
 		}
 	}
