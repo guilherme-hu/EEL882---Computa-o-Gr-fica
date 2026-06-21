@@ -175,6 +175,11 @@ function keyPressed() {
 		// Se a tela de aviso ainda estiver aberta, fecha ela
 		if (typeof warningOverlay !== 'undefined' && warningOverlay && warningOverlay.style('display') !== 'none') {
 			warningOverlay.style('display', 'none');
+			// Toca a música do menu se não estiver tocando caso jogador use N para tirar aviso
+			if (typeof music_menu !== 'undefined' && !music_menu.isPlaying()) {
+				music_menu.loop();
+				music_menu.setVolume(0.6);
+			}
 		}
 		return; 
 	}
@@ -223,8 +228,8 @@ function mouseDragged() {
 
 function mousePressed() {
 	if (currentState === GameState.START) {
+		// Toca a música do menu assim que o jogador tira o menu de aviso por clique de mouse
 		if (typeof music_menu !== 'undefined' && !music_menu.isPlaying()) {
-			userStartAudio();
 			music_menu.loop();
 			music_menu.setVolume(0.6);
 		}
