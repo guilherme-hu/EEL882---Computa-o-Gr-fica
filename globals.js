@@ -5,7 +5,8 @@ const GameState = {
 	MICROGAME: "MICROGAME",
 	RESULT: "RESULT",
 	PRE_GAME_OVER: "PRE_GAME_OVER",
-	GAME_OVER: "GAME_OVER"
+	GAME_OVER: "GAME_OVER",
+	PAUSE: "PAUSE"
 };
 
 let currentState = GameState.START;
@@ -16,6 +17,11 @@ let gameOverContainer;
 let highscoresList;
 let retryButton;
 let quitButton;
+
+// Overlay de Pausa
+let pauseContainer;
+let isPaused = false;
+let stateBeforePause = null;
 
 // Imagens e Texturas
 let phaseDiv;

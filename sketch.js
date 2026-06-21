@@ -133,6 +133,7 @@ function setup() {
 	phaseDiv.style('transition', 'transform 0.25s ease-out'); 
 	setupStartUI();
 	setupGameOverUI();
+	setupPauseUI();
 	
 	// Compila o modelo estático da nave para a VBO (GPU) apenas uma vez
 	if (typeof buildArwingModel === 'function') {
@@ -155,6 +156,9 @@ function windowResized() {
 
 // Atalhos do jogo para teste e debug
 function keyPressed() {
+	if (keyCode === ESCAPE) {
+		togglePause();
+	}
 	
 	// Alterna o Modo Desempenho entre os 3 níveis a qualquer momento apertando 'N'
 	if (key === 'n' || key === 'N') {
