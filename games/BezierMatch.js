@@ -207,6 +207,13 @@ class BezierMatch {
 			
 			if (isMatch && this.hasMoved) {
 				this.won = true;
+				
+				// Encaixe perfeito! Mostra a curva original no ângulo correto pra dar sensação de "click"
+				this.playerPoints[1].x = this.targetPoints[1].x;
+				this.playerPoints[1].y = this.targetPoints[1].y;
+				this.playerPoints[2].x = this.targetPoints[2].x;
+				this.playerPoints[2].y = this.targetPoints[2].y;
+				
 				this.draggingIndex = -1; // Force drop
 				if (typeof playWinVoiceline === 'function') playWinVoiceline();
 			}

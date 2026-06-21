@@ -362,9 +362,13 @@ class ClockMatch {
 		if (diffM > PI) diffM = TWO_PI - diffM;
 		
 		if (diffH <= margin && diffM <= margin) {
+			// Encaixe perfeito apenas quando os dois estão corretos (no momento da vitória)
+			this.playerAngleH = tH;
+			this.playerAngleM = tM;
+			
 			this.phase = 'REVEAL';
 			this.result = 'WIN';
-			playWinVoiceline();
+			if (typeof playWinVoiceline === 'function') playWinVoiceline();
 			this.createConfetti();
 		}
 	}
