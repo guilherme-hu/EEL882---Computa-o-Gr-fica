@@ -196,21 +196,21 @@ function keyPressed() {
 
 	if (currentState === GameState.START) return; 
 
-	// L para perder vida (ou resetar vidas se já estiver em 0)
-	if (key === 'l' || key === 'L') {
-		if (vidas > 0) {
-			performExplosion();
-		} else {
-			vidas = 4; 
-		}
-	}
+	// // L para perder vida (ou resetar vidas se já estiver em 0)
+	// if (key === 'l' || key === 'L') {
+	// 	if (vidas > 0) {
+	// 		performExplosion();
+	// 	} else {
+	// 		vidas = 4; 
+	// 	}
+	// }
 	
-	// K para ganhar vida (limite de 4 para manter a interface correta)
-	if (key === 'k' || key === 'K') {
-		if (vidas < 4) {
-			vidas++;
-		}
-	}
+	// // K para ganhar vida (limite de 4 para manter a interface correta)
+	// if (key === 'k' || key === 'K') {
+	// 	if (vidas < 4) {
+	// 		vidas++;
+	// 	}
+	// }
 }
 
 function mouseDragged() {
