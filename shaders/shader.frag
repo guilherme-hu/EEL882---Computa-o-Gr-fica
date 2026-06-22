@@ -64,10 +64,6 @@ float map(vec3 p) {
 
 // Star
 vec3 DrawStar(vec2 uv, float t) {
-    // Só renderiza se o raio foi muito longe 
-    float starFade = smoothstep(15.0, 30.0, t);
-    if (starFade <= 0.0) return vec3(0.0);
-    
     // NÚCLEO DA ESTRELA/PORTAL 
     float radius = length(uv * vec2(1.0, 1.0)); 
     
@@ -95,7 +91,7 @@ vec3 DrawStar(vec2 uv, float t) {
     vec3 flareColor = vec3(0.2, 0.6, 1.0) * flare; 
     
     // Combina o núcleo, os feixes e aplica o fade de profundidade
-    return (starColor * starGlow + flareColor) * starFade;
+    return starColor * starGlow + flareColor;
 }
 
 void main() {
@@ -144,13 +140,6 @@ void main() {
     if (t < 30.0) {
         // Usa a paleta cósmica baseada na distância e número de iterações do raymarching
         col = palette(t * 0.1 + iters * 0.015);
-        
-        // Névoa - Escurece objetos muito longe para sumirem suavemente
-        float fog = smoothstep(50.0, 10.0, t);
-        col *= fog;
-        
-        // Brilho volumétrico nas bordas das esferas
-        col += vec3(0.02, 0.1, 0.4) * (iters * 0.005);
     }
     
     // Estrela no fundo do cenário
