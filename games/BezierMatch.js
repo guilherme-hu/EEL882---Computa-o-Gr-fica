@@ -3,7 +3,7 @@ class BezierMatch {
 		this.timer = 0;
 		this.phase = 'PLAY'; 
 		
-		// Fix: Exactly 2 intermediate points (total 4 points, degree 3)
+		// 2 pontos de controle intermediários (total 4 pontos, grau 3)
 		this.numPoints = 4;
 		
 		this.targetPoints = [];
@@ -20,7 +20,7 @@ class BezierMatch {
 		this.gfxText.textAlign(CENTER, CENTER);
 		this.gfxText.textFont('Georgia'); // Uma fonte diferente da padrão
 		this.gfxText.textSize(120);
-		this.gfxText.textStyle(NORMAL); // Sem negrito
+		this.gfxText.textStyle(NORMAL); 
 		this.gfxText.fill(0); // Preto
 		this.gfxText.noStroke(); // Sem borda branca
 		this.gfxText.text("MOLDE!", 400, 100);
@@ -33,7 +33,7 @@ class BezierMatch {
 	}
 	
 	generatePoints() {
-		// p0 (start) - Increased area for larger paper
+		// p0 (start) 
 		let p0 = { x: random(-350, -250), y: random(-200, 200) };
 		// pn (end)
 		let pn = { x: random(250, 350), y: random(-200, 200) };
@@ -41,15 +41,15 @@ class BezierMatch {
 		this.targetPoints.push(p0);
 		this.playerPoints.push({ x: p0.x, y: p0.y });
 		
-		// Intermediates
-		let n = this.numPoints - 1; // Degree
+		// Pontos de controle Intermediários
+		let n = this.numPoints - 1; // grau 3 -> 4 pontos
 		for (let i = 1; i < n; i++) {
 			this.targetPoints.push({
 				x: random(-300, 300),
 				y: random(-200, 200)
 			});
 			
-			// Player intermediates start at a straight line between p0 and pn
+			// Pontos de controle intermediários do jogador ficam na linha entre p0 e pn
 			let t = i / n;
 			this.playerPoints.push({
 				x: lerp(p0.x, pn.x, t),
@@ -156,7 +156,7 @@ class BezierMatch {
 			}
 		}
 		
-		// End game logic based on audio finish
+		// Jogo acaba quando a música termina 
 		if (audioFinished && this.phase === 'PLAY') {
 			this.phase = 'RESULT';
 			if (this.won) {
@@ -170,7 +170,7 @@ class BezierMatch {
 		if (this.phase === 'PLAY' && !this.won) {
 			let isMatch = true;
 			
-			// Calculate how much of the target curve is "uncovered" (gray part showing)
+			// Falsos negativos - Amostragem na curva alvo comparando com a do jogador 
 			let uncoveredPoints = 0;
 			for (let u = 0.05; u < 0.95; u += 0.025) {
 				let ptTarget = this.evalBezier(this.targetPoints, u);
@@ -185,7 +185,7 @@ class BezierMatch {
 				}
 			}
 			
-			// Calculate how much of the player curve is "outside" the target
+			// Falsos positivos - Amostragem na curva do jogador comparando com a alvo
 			let outsidePoints = 0;
 			for (let t = 0.05; t < 0.95; t += 0.025) {
 				let ptPlayer = this.evalBezier(this.playerPoints, t);
@@ -195,7 +195,7 @@ class BezierMatch {
 					let d = dist(ptPlayer.x, ptPlayer.y, ptTarget.x, ptTarget.y);
 					if (d < minDist) minDist = d;
 				}
-				if (minDist > 15) { 
+				if (minDist > 10) { 
 					outsidePoints++;
 				}
 			}
@@ -208,13 +208,13 @@ class BezierMatch {
 			if (isMatch && this.hasMoved) {
 				this.won = true;
 				
-				// Encaixe perfeito! Mostra a curva original no ângulo correto pra dar sensação de "click"
+				// Encaixe perfeito, Mostra a curva original no ângulo correto
 				this.playerPoints[1].x = this.targetPoints[1].x;
 				this.playerPoints[1].y = this.targetPoints[1].y;
 				this.playerPoints[2].x = this.targetPoints[2].x;
 				this.playerPoints[2].y = this.targetPoints[2].y;
 				
-				this.draggingIndex = -1; // Force drop
+				this.draggingIndex = -1; // Solta o mouse automaticamente
 				if (typeof playWinVoiceline === 'function') playWinVoiceline();
 			}
 		}
@@ -223,10 +223,11 @@ class BezierMatch {
 			this.spawnConfetti();
 		}
 		
-		// Update Hover (Fix inverted mouse)
+		// Correção de mouse invertido
 		let webglX = mouseX - width / 2;
 		let webglY = height / 2 - mouseY;
 		
+		// Verifica se o mouse está próximo de algum ponto de controle para hover
 		this.hoverIndex = -1;
 		if (this.draggingIndex === -1 && this.phase === 'PLAY' && !this.won) {
 			for (let i = 1; i < this.playerPoints.length - 1; i++) {
@@ -238,7 +239,6 @@ class BezierMatch {
 		}
 
 		// Desenho da Cena
-		// Special victory background effect
 		if (this.won) {
 			let pulse = map(sin(this.timer * 0.2), -1, 1, 0, 50);
 			background(160 + pulse, 100 + pulse/2, 60); 
@@ -264,12 +264,10 @@ class BezierMatch {
 		
 		// Desenha Curva Meta (Cinza fraco)
 		this.drawBezier(this.targetPoints, color(180, 180, 180, 150), 6);
-		
-		// Removed target handles to hide their location as requested
-		
+				
 		// Desenha Curva do Jogador
 		if (this.won) {
-			// Celebrate: Curve changes color
+			// Vitória: Efeito de arco-íris pulsante na curva
 			let hue = (this.timer * 5) % 360;
 			colorMode(HSB);
 			this.drawBezier(this.playerPoints, color(hue, 80, 100), 6);
@@ -287,17 +285,17 @@ class BezierMatch {
 			}
 			
 			for (let i = 1; i < this.playerPoints.length - 1; i++) {
-				if (i === this.draggingIndex) {
+				if (i === this.draggingIndex) { // Destaque do ponto sendo arrastado
 					fill(255, 50, 50);
 					stroke(0);
 					strokeWeight(2);
 					ellipse(this.playerPoints[i].x, this.playerPoints[i].y, 20, 20);
-				} else if (i === this.hoverIndex) {
+				} else if (i === this.hoverIndex) { // Destaque de ponto próximo para arrastar
 					fill(255, 100, 100);
 					stroke(0);
 					strokeWeight(2);
 					ellipse(this.playerPoints[i].x, this.playerPoints[i].y, 18, 18);
-				} else {
+				} else { // Pontos normais
 					fill(200, 30, 30);
 					stroke(0);
 					strokeWeight(2);
@@ -311,14 +309,14 @@ class BezierMatch {
 			push();
 			let alpha = map(this.commandTimer, 0, 15, 0, 255);
 			alpha = constrain(alpha, 0, 255);
-			tint(255, alpha);
+			tint(255, alpha); // Fade out nos últimos frames
 			
 			imageMode(CENTER);
 			
 			// Efeito de pulo (Pop) nos primeiros frames
 			let scalePop = map(this.commandTimer, 60, 50, 2.0, 1.0);
 			scalePop = constrain(scalePop, 1.0, 2.0);
-			scale(scalePop, -scalePop); // O -scalePop desinverte o eixo Y do WebGL pra imagem não ficar de ponta-cabeça
+			scale(scalePop, -scalePop); // -scalePop desinverte o eixo Y do WebGL pra imagem não ficar de ponta-cabeça
 			
 			image(this.gfxText, 0, 0);
 			pop();
@@ -333,7 +331,7 @@ class BezierMatch {
 		let barW = map(progress, 0, 1, 0, 800);
 		noStroke();
 		if (this.won) {
-			fill(0, 255, 100); // Green bar if won
+			fill(0, 255, 100); // Barra verde se venceu
 		} else {
 			fill(255, 50, 0);
 		}
