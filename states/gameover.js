@@ -101,10 +101,10 @@ function triggerGameOver() {
 	
 	// Exibe pontuação atual
 	let scoreEl = document.getElementById('currentScoreDiv');
-	if (scoreEl) scoreEl.innerHTML = `Sua pontuação: <span style="color:#ff5000">${finalScore} pts</span>`;
+	if (scoreEl) scoreEl.innerHTML = `Sua pontuação: <span style="color:#ff5000">${score} pts</span>`;
 
 	// Atualiza e ordena os highscores
-	highscores.push(finalScore);
+	highscores.push(score);
 	highscores.sort((a, b) => b - a); // Ordem decrescente
 	if (highscores.length > 5) {
 		highscores.length = 5; // Mantém só os top 5
