@@ -147,6 +147,8 @@ function drawIris(progress, cx = 0, cy = 0, useShader = false) {
 	resetMatrix();
 	ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 1000);
 	
+	clearDepth(); // Garante que a íris seja desenhada por cima de todas as formas 3D!
+	
 	if (useShader && typeof my_shader !== 'undefined' && !performanceMode) {
 		shader(my_shader);
 		my_shader.setUniform('iResolution', [width, height]);
