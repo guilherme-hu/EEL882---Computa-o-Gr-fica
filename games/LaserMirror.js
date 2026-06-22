@@ -59,7 +59,7 @@ class LaserMirror {
 				});
 			}
 			
-			// Centraliza o cenário no meio da tela ANTES de criar as paredes
+			// Centraliza o cenário no meio da tela antes de criar as paredes
 			let cxSum = this.target.x + this.emitter.x;
 			let cySum = this.target.y + this.emitter.y;
 			let count = 2;
@@ -82,14 +82,14 @@ class LaserMirror {
 				center.x += random(-15, 15);
 				center.y += random(-15, 15);
 				let angle = p5.Vector.sub(v2, v1).heading() + HALF_PI;
-				this.walls.push({ x: center.x, y: center.y, angle: angle, length: 100 }); // Parede menor (100)
+				this.walls.push({ x: center.x, y: center.y, angle: angle, length: 100 }); 
 			};
 			
 			addBlockWall(this.emitter, this.target);
 			addBlockWall(this.emitter, this.mirrors[1]);
 			addBlockWall(this.mirrors[0], this.target);
 			
-			// VALIDAÇÃO: as paredes geradas bloqueiam o caminho válido?
+			// VALIDAÇÃO: se as paredes geradas bloqueiam o caminho válido
 			let pE = createVector(this.emitter.x, this.emitter.y);
 			let pM1 = createVector(this.mirrors[0].x, this.mirrors[0].y);
 			let pM2 = createVector(this.mirrors[1].x, this.mirrors[1].y);
@@ -269,7 +269,7 @@ class LaserMirror {
 			if (deltaAngle > PI) deltaAngle -= TWO_PI;
 			if (deltaAngle < -PI) deltaAngle += TWO_PI;
 			
-			// Rotaciona o espelho proporcionalmente com uma taxa de 0.5 para maior precisão!
+			// Rotaciona o espelho proporcionalmente com uma taxa de 0.5 para maior precisão
 			this.selectedMirror.angle += deltaAngle * 0.5;
 			this.lastMouseAngle = currentMouseAngle;
 		}
@@ -282,13 +282,12 @@ class LaserMirror {
 	draw() {
 		this.timer += dt;
 		
-		// Fundo plano 2D futurista escuro
 		background(10, 15, 30); 
 		
 		push();
 		resetMatrix();
 		ortho(); // Conserta o eixo Y voltando para o padrão do p5
-		noLights(); // O jogo é perfeitamente 2D!
+		noLights();
 		
 		// Desenha o Alvo (Dartboard com círculos vermelhos e brancos)
 		push();
@@ -375,7 +374,7 @@ class LaserMirror {
 		rect(15, 0, 20, 15); // Bico do canhão
 		pop();
 		
-		// SIMULAÇÃO DO LASER (Motor de Raycast)
+		// SIMULAÇÃO DO LASER 
 		let maxBounces = 15;
 		let segments = [];
 		let currentPt = createVector(this.emitter.x + cos(this.emitter.angle)*25, this.emitter.y + sin(this.emitter.angle)*25);
@@ -432,7 +431,7 @@ class LaserMirror {
 		
 		pop(); // Retorna das configs ortográficas da fase 2D
 		
-		// Barra de tempo sincronizada (Padrão dos Microgames)
+		// Barra de tempo sincronizada 
 		push();
 		resetMatrix();
 		let progress = 1.0;
@@ -468,20 +467,7 @@ class LaserMirror {
 					c.rotZ += c.rotSpeedZ * dt;
 				}
 				pop();
-			} else if (this.result === 'LOSE') {
-				// Efeito de erro balançando a tela como pedido
-				translate(random(-15, 15), random(-15, 15), 0);
-				push();
-				translate(0, 0, 100);
-				fill(255, 0, 0);
-				noStroke();
-				rectMode(CENTER);
-				rotateZ(PI/4);
-				rect(0, 0, 40, 200);
-				rotateZ(PI/2);
-				rect(0, 0, 40, 200);
-				pop();
-			}
+			} 
 		}
 		
 		// Executa gatilho de vitória

@@ -14,14 +14,14 @@ class SecretShape {
 		
 		this.initShapes();
 		
-		// Lógica nova para garantir probabilidade uniforme para todos os sólidos (chance exata de 1/12)
+		// Lógica para escolher sólido amostrado
 		// 1. Sorteia a forma secreta de todo o pool disponível
 		this.correctShape = this.shapesInfo[Math.floor(Math.random() * this.shapesInfo.length)];
 		
-		// 2. Escolhe uma das classes válidas dessa forma para balizar as opções falsas
+		// 2. Escolhe uma das classes válidas dessa forma para escolher as opções falsas
 		this.chosenClass = this.correctShape.classes[Math.floor(Math.random() * this.correctShape.classes.length)];
 		
-		// 3. Pega todas as formas que compartilham essa classe (para o usuário se confundir)
+		// 3. Pega todas as formas que compartilham essa classe 
 		let validShapes = this.shapesInfo.filter(s => s.classes.indexOf(this.chosenClass) !== -1);
 		
 		// 4. Remove a forma correta da lista de opções falsas
@@ -40,7 +40,7 @@ class SecretShape {
 		this.baseRotX = rot.rx;
 		this.baseRotY = rot.ry;
 		
-		// Rotação acumulada pelo mouse (começa zerada para evitar gimbal lock)
+		// Rotação acumulada pelo mouse (começa em 0, e a rotação final é base + acumulada)
 		this.rotX = 0;
 		this.rotY = 0;
 		
@@ -48,8 +48,7 @@ class SecretShape {
 			music_secretshape.play();
 		}
 		
-		// OTIMIZAÇÃO: A função text() no p5.js WEBGL gera uma imagem invisível nova a cada frame. 
-		// Para o jogo ficar a 60 FPS, precisamos criar a imagem do texto 1 vez e desenhá-la sempre.
+		// Gráficos de texto pré-renderizados 
 		this.gfxGire = this.createTextGraphic("GIRE!");
 		this.gfxEscolha = this.createTextGraphic("ESCOLHA!");
 		this.gfxCerto = this.createTextGraphic("CERTO!");
@@ -80,7 +79,7 @@ class SecretShape {
 				id: 'losango',
 				classes: ['Quad'],
 				draw: () => this.drawLosango(60, 160),
-				rotations: { 'Quad': {rx: -HALF_PI, ry: 0} } // Padronizado para -HALF_PI
+				rotations: { 'Quad': {rx: -HALF_PI, ry: 0} } 
 			},
 			{
 				id: 'sphere',
@@ -92,7 +91,7 @@ class SecretShape {
 				id: 'elipsoide',
 				classes: ['Circ'],
 				draw: () => ellipsoid(60, 120, 60),
-				rotations: { 'Circ': {rx: -HALF_PI, ry: 0} } // Padronizado
+				rotations: { 'Circ': {rx: -HALF_PI, ry: 0} }
 			},
 			{
 				id: 'seta',
@@ -104,7 +103,7 @@ class SecretShape {
 				id: 'cylinder',
 				classes: ['Quad', 'Circ'],
 				draw: () => cylinder(60, 120),
-				rotations: { 'Quad': {rx: 0, ry: 0}, 'Circ': {rx: -HALF_PI, ry: 0} } // Padronizado
+				rotations: { 'Quad': {rx: 0, ry: 0}, 'Circ': {rx: -HALF_PI, ry: 0} } 
 			},
 			{
 				id: 'cone',
@@ -154,44 +153,44 @@ class SecretShape {
 		return array;
 	}
 
-	// === FORMAS CUSTOMIZADAS ===
+	// FORMAS CUSTOMIZADAS 
 	
 	drawTruncatedPyramid(topR, bottomR, h) {
 		push();
 		beginShape(QUADS);
 		let halfH = h / 2;
 		
-		// Top
+		// Topo
 		vertex(-topR, -halfH, -topR);
 		vertex( topR, -halfH, -topR);
 		vertex( topR, -halfH,  topR);
 		vertex(-topR, -halfH,  topR);
 		
-		// Bottom
+		// Base
 		vertex(-bottomR, halfH, -bottomR);
 		vertex( bottomR, halfH, -bottomR);
 		vertex( bottomR, halfH,  bottomR);
 		vertex(-bottomR, halfH,  bottomR);
 		
-		// Front
+		// Frente
 		vertex(-topR, -halfH, topR);
 		vertex( topR, -halfH, topR);
 		vertex( bottomR, halfH, bottomR);
 		vertex(-bottomR, halfH, bottomR);
 		
-		// Right
+		// Direita
 		vertex( topR, -halfH, topR);
 		vertex( topR, -halfH, -topR);
 		vertex( bottomR, halfH, -bottomR);
 		vertex( bottomR, halfH,  bottomR);
 		
-		// Back
+		// Trás
 		vertex( topR, -halfH, -topR);
 		vertex(-topR, -halfH, -topR);
 		vertex(-bottomR, halfH, -bottomR);
 		vertex( bottomR, halfH, -bottomR);
 		
-		// Left
+		// Esquerda
 		vertex(-topR, -halfH, -topR);
 		vertex(-topR, -halfH,  topR);
 		vertex(-bottomR, halfH,  bottomR);
@@ -205,17 +204,17 @@ class SecretShape {
 		push();
 		let halfH = h / 2;
 		beginShape(TRIANGLES);
-		// Front
+		// Frente
 		vertex(0, -halfH, 0); vertex(-r, halfH, r); vertex(r, halfH, r);
-		// Right
+		// Direita
 		vertex(0, -halfH, 0); vertex(r, halfH, r); vertex(r, halfH, -r);
-		// Back
+		// Trás
 		vertex(0, -halfH, 0); vertex(r, halfH, -r); vertex(-r, halfH, -r);
-		// Left
+		// Esquerda
 		vertex(0, -halfH, 0); vertex(-r, halfH, -r); vertex(-r, halfH, r);
 		endShape();
 		beginShape(QUADS);
-		// Bottom
+		// Base
 		vertex(-r, halfH, r); vertex(r, halfH, r); vertex(r, halfH, -r); vertex(-r, halfH, -r);
 		endShape();
 		pop();
@@ -323,13 +322,13 @@ class SecretShape {
 		pop();
 	}
 
-	// === LOOP PRINCIPAL DO MICROGAME ===
+
+	// LOOP PRINCIPAL DO MICROGAME
 
 	draw() {
-		this.timer += dt; // Incrementa baseado no tempo real, não frames brutos
+		this.timer += dt; // Incrementa baseado no tempo real, não frames
 		
-		// Fundo verde como na referência
-		background(140, 190, 80);
+		background(140, 190, 80); // Fundo verde 
 		
 		if (this.phase === 'ROTATE') {
 			this.drawRotatePhase();
@@ -339,14 +338,11 @@ class SecretShape {
 			}
 		} else if (this.phase === 'CHOOSE') {
 			this.drawChoosePhase();
-			// Em vez do timer estático, o tempo do microgame é definido pela música
 			if (typeof music_secretshape !== 'undefined' && !music_secretshape.isPlaying() && this.timer > 30) {
-				// Acabou a música e não escolheu = Derrota!
 				loseMicrogame();
 			}
-		} else if (this.phase === 'REVEAL') {
+		} else if (this.phase === 'REVEAL') { // Para quando a pessoa escolhe a resposta (acertando ou errando)
 			this.drawRevealPhase();
-			// Na fase Reveal, aguardamos pacientemente a música acabar para finalizar o microgame
 			if (typeof music_secretshape !== 'undefined' && !music_secretshape.isPlaying() && this.timer > 30) {
 				if (this.result === 'WIN') {
 					winMicrogame();
@@ -359,7 +355,7 @@ class SecretShape {
 		// Transição de Íris Fechando (Retorno para o Hub) no final do jogo
 		if (typeof music_secretshape !== 'undefined' && music_secretshape.isPlaying()) {
 			let timeLeft = music_secretshape.duration() - music_secretshape.currentTime();
-			// Faltando 0.35 segundos (rápido!), fecha a Íris em direção à estrela
+			// Faltando 0.35 segundos, fecha a Íris
 			if (timeLeft > 0 && timeLeft < 0.35) {
 				let progress = timeLeft / 0.35; // Vai de 1 até 0
 				progress = Math.pow(progress, 3); // ease-in (acelera no final)
@@ -401,7 +397,7 @@ class SecretShape {
 		noStroke();
 		translate(0, -50, 0);
 		
-		// Aplica a rotação do mouse (Turntable base zero)
+		// Aplica a rotação do mouse 
 		rotateX(this.rotX);
 		rotateY(this.rotY);
 		
@@ -418,7 +414,7 @@ class SecretShape {
 	}
 	
 	drawChoosePhase() {
-		// Barra de tempo sincronizada com a música! (Posicionada igual WhackABump)
+		// Barra de tempo sincronizada com a música! 
 		push();
 		resetMatrix();
 		let progress = 1.0 - (this.timer / this.durationChoose);
@@ -464,7 +460,7 @@ class SecretShape {
 			ambientLight(100);
 			directionalLight(255, 255, 255, 1, 0.5, -1);
 			
-			fill(255, 200, 50); // Cor amarelada/alaranjada para destacar
+			fill(255, 200, 50); // Cor amarela
 			noStroke();
 			
 			// Leve rotação contínua para apresentação da forma
@@ -478,7 +474,7 @@ class SecretShape {
 				rotateY(bRot.ry);
 			}
 			
-			// Diminui um pouco a escala para caber bem no painel
+			// Diminuir um pouco a escala para caber bem no painel
 			scale(0.6);
 			this.options[i].draw();
 			
@@ -489,7 +485,7 @@ class SecretShape {
 	
 	drawRevealPhase() {
 		if (this.result === 'WIN') {
-			// Fundo de vitória alegre
+			// Fundo de vitória 
 			background(100, 200, 255);
 			
 			// Forma real, iluminada e gigante no centro
@@ -553,7 +549,6 @@ class SecretShape {
 			this.correctShape.draw();
 			pop();
 			
-			// Opções com o X vermelho na que errou
 			let spacing = min(width / 3.5, 300);
 			for (let i = 0; i < 3; i++) {
 				push();
@@ -572,7 +567,7 @@ class SecretShape {
 					fill(255, 50, 50); // Painel vermelho vivo indicando erro
 				} else if (i === this.correctIndex) {
 					let pulse = map(sin(globalTime * 0.15), -1, 1, 100, 255);
-					fill(50, pulse, 50); // Painel verde pulsante para ensinar a certa
+					fill(50, pulse, 50); // Painel verde pulsante para mostrar a certa
 				} else {
 					fill(255); // Painel branco normal
 				}
@@ -586,7 +581,7 @@ class SecretShape {
 				
 				// Cor do objeto: escurece o errado, mantém o certo
 				if (i === this.wrongChoiceIndex) {
-					fill(100, 20, 20); // Escurece o objeto que você clicou errado
+					fill(100, 20, 20);
 				} else {
 					fill(255, 200, 50); 
 				}
@@ -647,14 +642,14 @@ class SecretShape {
 		}
 	}
 	
-	// === EVENTOS ===
+	// EVENTOS
 	
 	mouseDragged() {
 		if (this.phase === 'ROTATE') {
 			this.rotY += (mouseX - pmouseX) * 0.01;
-			this.rotX -= (mouseY - pmouseY) * 0.01; // Restaura a rotação intuitiva (pitch correto)
+			this.rotX -= (mouseY - pmouseY) * 0.01; 
 			
-			// Trava o eixo X para evitar o Gimbal Lock matemático (que engole o eixo Y)
+			// Trava o eixo X para evitar rotações de sentido invertido
 			this.rotX = constrain(this.rotX, -1.2, 1.2); 
 		}
 	}
@@ -662,10 +657,8 @@ class SecretShape {
 	mousePressed() {
 		if (this.phase === 'CHOOSE') {
 			let spacing = min(width / 3.5, 300);
-			// Centro da tela é x=0. As opções estão em:
-			// -spacing, 0, +spacing
-			// Mapeando a coordenada X do mouse (que vai de 0 a width) 
-			// para a coordenada X WebGL (que vai de -width/2 a width/2)
+			// Centro da tela é x=0, As opções estão em: -spacing, 0, +spacing
+			// Precisamos mapear a coordenada X do mouse (que vai de 0 a width) para a coordenada X WebGL (que vai de -width/2 a width/2)
 			let webglX = mouseX - width / 2;
 			
 			// Margem de tolerância (largura do painel)

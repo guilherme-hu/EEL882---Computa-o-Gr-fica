@@ -10,7 +10,7 @@ class WhackABump {
 		this.nu = 5;
 		this.nv = 5;
 		this.ctrl = [];
-		let extent = 800; // Aumentado para ocupar mais espaço
+		let extent = 800;
 		let sp = extent / (this.nu - 1);
 		
 		// Criar grade no plano X, Y. Z será a altura do galo.
@@ -30,7 +30,7 @@ class WhackABump {
 		// Escolher 2 pontos internos aleatórios para elevar (os "galos")
 		let elevated = 0;
 		while(elevated < 2) {
-			let i = floor(random(1, 4)); // Entre 1 e 4 (borda interna)
+			let i = floor(random(1, 4)); // Entre 1 e 4 (bordas interna)
 			let j = floor(random(1, 4));
 			if (this.ctrl[i][j].targetZ === 0) {
 				// Galos apontam para cima (com rotateX positivo, o eixo Z positivo sobe na tela)
@@ -51,7 +51,6 @@ class WhackABump {
 		this.gfxText.textFont('Georgia');
 		this.gfxText.textSize(120);
 		this.gfxText.textStyle(NORMAL);
-		this.gfxText.text("ESMAGUE!", 400, 100);
 		this.gfxText.text("ESMAGUE!", 400, 100);
 		
 		if (typeof audio_bonk !== 'undefined' && audio_bonk) {
@@ -215,7 +214,6 @@ class WhackABump {
 				let j = floor(random(1, 4));
 				if (this.ctrl[i][j].targetZ === 0 && this.ctrl[i][j].z < 5) {
 					this.ctrl[i][j].targetZ = 200; // Define que ele quer ser um galo
-					// Não alteramos o z atual, assim a lógica de animação fará ele crescer!
 					spawned = true;
 				}
 				attempts++;
@@ -233,7 +231,7 @@ class WhackABump {
 					}
 					this.dirty = true;
 				} else if (this.ctrl[i][j].z < this.ctrl[i][j].targetZ) {
-					this.ctrl[i][j].z += 80 * dt; // Subindo! (Efeito de brotar rapidamente)
+					this.ctrl[i][j].z += 80 * dt; // Subindo (Efeito de brotar rapidamente)
 					if (this.ctrl[i][j].z > this.ctrl[i][j].targetZ) {
 						this.ctrl[i][j].z = this.ctrl[i][j].targetZ;
 					}
@@ -322,7 +320,7 @@ class WhackABump {
 					fill(255, 75, 75);
 					sphere(25);
 					
-					// Calcular a projeção manualmente para evitar crashes com o screenX nativo
+					// Calcular a projeção para evitar crashes com o screenX nativo
 					// 1. Rotação Z
 					let x1 = pt.x * Math.cos(angZ) - pt.y * Math.sin(angZ);
 					let y1 = pt.x * Math.sin(angZ) + pt.y * Math.cos(angZ);
@@ -349,7 +347,7 @@ class WhackABump {
 				pop();
 			}
 		}
-		pop(); // Fim do mundo 3D
+		pop(); 
 		
 		// Barra de tempo na frente
 		push();
@@ -384,9 +382,6 @@ class WhackABump {
 		let best = null;
 		let bestD = 30; // Margem de erro do clique
 		for (let target of this.clickTargets) {
-			// Em WebGL, mouseX e mouseY variam do canto superior esquerdo até bottom right
-			// O canvas WebGL centraliza no 0,0, então a projeção manual que fizemos mapeou com 0,0 no centro.
-			// mouseX - width/2 é o mapeamento correto.
 			let mx = mouseX - width / 2;
 			let my = mouseY - height / 2;
 			
