@@ -29,7 +29,8 @@ class WhackABump {
 		
 		// Escolher 2 pontos internos aleatórios para elevar (os "galos")
 		let elevated = 0;
-		while(elevated < 2) {
+		let attempts = 0;
+		while(elevated < 2 && attempts < 100) {
 			let i = floor(random(1, 4)); // Entre 1 e 4 (bordas interna)
 			let j = floor(random(1, 4));
 			if (this.ctrl[i][j].targetZ === 0) {
@@ -38,6 +39,7 @@ class WhackABump {
 				this.ctrl[i][j].z = 200;
 				elevated++;
 			}
+			attempts++;
 		}
 		
 		this.dirty = true;
