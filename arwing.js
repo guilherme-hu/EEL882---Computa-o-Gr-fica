@@ -84,21 +84,11 @@ function buildArwingModel() {
         let cpR = v(12, -16, 15);
         let cpTop = v(0, -35, 5);
 
+        // cGlass
         tri(cpFront, cpL, cpTop, cDarkGrey);
         tri(cpFront, cpTop, cpR, cDarkGrey);
         tri(cpBack, cpTop, cpL, cDarkGrey);
         tri(cpBack, cpR, cpTop, cDarkGrey);
-
-        let gFront = v(0, -17, 36);
-        let gBack = v(0, -19, -16);
-        let gL = v(-10, -17, 15);
-        let gR = v(10, -17, 15);
-        let gTop = v(0, -34, 5);
-        
-        tri(gFront, gL, gTop, cGlass);
-        tri(gFront, gTop, gR, cGlass);
-        tri(gBack, gTop, gL, cGlass);
-        tri(gBack, gR, gTop, cGlass);
 
         // 4) Asas Principais
         let wL1 = v(-25, 0, 10);    
@@ -115,23 +105,19 @@ function buildArwingModel() {
         let wR5 = v(80, 0, -90);   
         let wR6 = v(15, 0, -60);   
 
-        tri(wL1, wL2, wL4, cWhite);
-        tri(wL2, wL3, wL4, cWhite);
+        quad3(wL1, wL2, wL3, wL4, cWhite);
         quad3(wL4, wL5, wL6, wL1, cWhite);
         
         push(); translate(0, 1, 0);
-        tri(wL1, wL4, wL2, cWhite);
-        tri(wL2, wL4, wL3, cWhite);
+        quad3(wL1, wL4, wL3, wL2, cWhite);
         quad3(wL4, wL1, wL6, wL5, cWhite);
         pop();
 
-        tri(wR1, wR4, wR2, cWhite);
-        tri(wR2, wR4, wR3, cWhite);
+        quad3(wR1, wR4, wR3, wR2, cWhite);
         quad3(wR4, wR1, wR6, wR5, cWhite);
 
         push(); translate(0, 1, 0);
-        tri(wR1, wR2, wR4, cWhite);
-        tri(wR2, wR3, wR4, cWhite);
+        quad3(wR1, wR2, wR3, wR4, cWhite);
         quad3(wR4, wR5, wR6, wR1, cWhite);
         pop();
 

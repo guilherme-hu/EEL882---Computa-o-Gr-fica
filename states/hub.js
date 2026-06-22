@@ -147,7 +147,7 @@ function drawHubScene() {
 		directionalLight(0, 200, 255, -0.8, -1, 0.5); // Luz ciano vindo de baixo para cima
 		directionalLight(200, 0, 255, 0.8, -1, 0.5); // Luz magenta vindo de baixo para cima
 
-		// Chama a função que desenha a Arwing passando o número de vidas ativas
+		// Função que desenha a Arwing passando o número de vidas ativas
 		if (typeof drawArwing === 'function') {
 			drawArwing(vidas); // Vidas para decidir quais turbinas estão acesas
 		}
