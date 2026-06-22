@@ -106,4 +106,5 @@ function stopAllMicrogameMusic() {
 	if (typeof music_clockmatch !== 'undefined' && music_clockmatch.isPlaying()) music_clockmatch.stop();
 	if (typeof music_lasermirror !== 'undefined' && music_lasermirror.isPlaying()) music_lasermirror.stop();
 	if (typeof audio_beziermatch !== 'undefined' && audio_beziermatch.isPlaying()) audio_beziermatch.stop();
+	if (typeof audio_bonk !== 'undefined' && audio_bonk.isPlaying()) audio_bonk.stop();
 }
