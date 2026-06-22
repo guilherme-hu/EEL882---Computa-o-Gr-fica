@@ -1,3 +1,4 @@
+// noprotect
 class LaserMirror {
 	constructor() {
 		this.phase = 'PLAY';

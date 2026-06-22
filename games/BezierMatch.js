@@ -1,3 +1,4 @@
+// noprotect
 class BezierMatch {
 	constructor() {
 		this.timer = 0;

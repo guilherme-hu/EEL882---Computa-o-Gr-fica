@@ -1,4 +1,5 @@
-﻿function preload() {
+// noprotect
+function preload() {
 	// Shader do fundo
 	my_shader = loadShader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -279,11 +280,10 @@ let lastLoseVl = null;
 function playWinVoiceline() {
 	if (enableVoicelines && !isMuted && voicelines_win && voicelines_win.length > 0) {
 		let vl = random(voicelines_win);
-		// Previne repetição imediata se houver mais de 1 opção
-		if (voicelines_win.length > 1) {
-			while (vl === lastWinVl) {
-				vl = random(voicelines_win);
-			}
+		// Previne repetição imediata filtrando a última voz tocada
+		if (voicelines_win.length > 1 && lastWinVl !== null) {
+			let options = voicelines_win.filter(v => v !== lastWinVl);
+			vl = random(options);
 		}
 		lastWinVl = vl;
 		vl.sound.setVolume(vl.vol);
@@ -312,10 +312,9 @@ function loseMicrogame() {
 	if (enableVoicelines && !isMuted && voicelines_lose.length > 0) {
 		let vl = random(voicelines_lose);
 		// Previne repetição imediata
-		if (voicelines_lose.length > 1) {
-			while (vl === lastLoseVl) {
-				vl = random(voicelines_lose);
-			}
+		if (voicelines_lose.length > 1 && lastLoseVl !== null) {
+			let options = voicelines_lose.filter(v => v !== lastLoseVl);
+			vl = random(options);
 		}
 		lastLoseVl = vl;
 		vl.sound.setVolume(vl.vol);

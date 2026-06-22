@@ -1,3 +1,4 @@
+// noprotect
 class WhackABump {
 	constructor() {
 		this.timer = 0;
@@ -29,17 +30,15 @@ class WhackABump {
 		
 		// Escolher 2 pontos internos aleatórios para elevar (os "galos")
 		let elevated = 0;
-		let attempts = 0;
-		while(elevated < 2 && attempts < 100) {
+		for (let attempts = 0; attempts < 100; attempts++) {
 			let i = floor(random(1, 4)); // Entre 1 e 4 (bordas interna)
 			let j = floor(random(1, 4));
 			if (this.ctrl[i][j].targetZ === 0) {
-				// Galos apontam para cima (com rotateX positivo, o eixo Z positivo sobe na tela)
 				this.ctrl[i][j].targetZ = 200;
 				this.ctrl[i][j].z = 200;
 				elevated++;
+				if (elevated >= 2) break;
 			}
-			attempts++;
 		}
 		
 		this.dirty = true;
@@ -74,54 +73,41 @@ class WhackABump {
 	
 	subdivideRow(pts) {
 		let doubled = [];
-		for (let i = 0; i < pts.length; i++) {
-			doubled.push({x: pts[i].x, y: pts[i].y, z: pts[i].z});
-			doubled.push({x: pts[i].x, y: pts[i].y, z: pts[i].z});
-		}
+		pts.forEach(p => {
+			doubled.push({x: p.x, y: p.y, z: p.z});
+			doubled.push({x: p.x, y: p.y, z: p.z});
+		});
+		
 		let smoothed = [];
-		for (let i = 0; i < doubled.length - 1; i++) {
+		doubled.slice(0, -1).forEach((p, i) => {
+			let next = doubled[i+1];
 			smoothed.push({
-				x: 0.5 * doubled[i].x + 0.5 * doubled[i+1].x,
-				y: 0.5 * doubled[i].y + 0.5 * doubled[i+1].y,
-				z: 0.5 * doubled[i].z + 0.5 * doubled[i+1].z
+				x: 0.5 * p.x + 0.5 * next.x,
+				y: 0.5 * p.y + 0.5 * next.y,
+				z: 0.5 * p.z + 0.5 * next.z
 			});
-		}
+		});
 		return smoothed;
 	}
 	
 	subdivideSurface(grid) {
-		let rowsSub = [];
-		for (let i = 0; i < grid.length; i++) {
-			rowsSub.push(this.subdivideRow(grid[i]));
-		}
+		let rowsSub = grid.map(row => this.subdivideRow(row));
 		
 		// Transpose
 		let cols = rowsSub[0].length;
-		let transposed = [];
-		for (let j = 0; j < cols; j++) {
-			let col = [];
-			for (let i = 0; i < rowsSub.length; i++) {
-				col.push(rowsSub[i][j]);
-			}
-			transposed.push(col);
-		}
+		let transposed = Array.from({length: cols}, (_, j) => {
+			return rowsSub.map(row => row[j]);
+		});
 		
 		// Subdivide columns
-		let colsSub = [];
-		for (let j = 0; j < transposed.length; j++) {
-			colsSub.push(this.subdivideRow(transposed[j]));
-		}
+		let colsSub = transposed.map(col => this.subdivideRow(col));
 		
 		// Transpose back
-		let finalGrid = [];
 		let finalRows = colsSub[0].length;
-		for (let i = 0; i < finalRows; i++) {
-			let row = [];
-			for (let j = 0; j < colsSub.length; j++) {
-				row.push(colsSub[j][i]);
-			}
-			finalGrid.push(row);
-		}
+		let finalGrid = Array.from({length: finalRows}, (_, i) => {
+			return colsSub.map(col => col[i]);
+		});
+		
 		return finalGrid;
 	}
 	
@@ -143,7 +129,7 @@ class WhackABump {
 	drawConfetti() {
 		push();
 		resetMatrix(); // Garante que será desenhado como 2D na tela
-		for (let p of this.particles) {
+		this.particles.forEach(p => {
 			p.x += p.vx;
 			p.y += p.vy;
 			p.rot += p.rotSpeed;
@@ -156,7 +142,7 @@ class WhackABump {
 			rectMode(CENTER);
 			rect(0, 0, p.size, p.size);
 			pop();
-		}
+		});
 		pop();
 	}
 	
@@ -209,42 +195,32 @@ class WhackABump {
 		let effectiveSpawnTime = baseSpawnTime / Math.max(speedMult, 0.01);
 		if (this.timer > effectiveSpawnTime && !this.surpriseSpawned && this.phase === 'PLAY') {
 			this.surpriseSpawned = true;
-			let spawned = false;
-			let attempts = 0;
-			while(!spawned && attempts < 20) {
+			for (let attempts = 0; attempts < 20; attempts++) {
 				let i = floor(random(1, 4));
 				let j = floor(random(1, 4));
 				if (this.ctrl[i][j].targetZ === 0 && this.ctrl[i][j].z < 5) {
 					this.ctrl[i][j].targetZ = 200; // Define que ele quer ser um galo
-					spawned = true;
+					break;
 				}
-				attempts++;
 			}
 		}
 		
 		// Animação descendo ou subindo
 		let maxElevation = 0;
-		for (let i = 0; i < this.nu; i++) {
-			for (let j = 0; j < this.nv; j++) {
-				if (this.ctrl[i][j].z > this.ctrl[i][j].targetZ) { 
-					this.ctrl[i][j].z -= 60 * dt; // Descendo em direção ao zero
-					if (this.ctrl[i][j].z < this.ctrl[i][j].targetZ) {
-						this.ctrl[i][j].z = this.ctrl[i][j].targetZ;
-					}
+		this.ctrl.forEach(row => {
+			row.forEach(cell => {
+				if (cell.z > cell.targetZ) { 
+					cell.z -= 60 * dt; 
+					if (cell.z < cell.targetZ) cell.z = cell.targetZ;
 					this.dirty = true;
-				} else if (this.ctrl[i][j].z < this.ctrl[i][j].targetZ) {
-					this.ctrl[i][j].z += 80 * dt; // Subindo (Efeito de brotar rapidamente)
-					if (this.ctrl[i][j].z > this.ctrl[i][j].targetZ) {
-						this.ctrl[i][j].z = this.ctrl[i][j].targetZ;
-					}
+				} else if (cell.z < cell.targetZ) {
+					cell.z += 80 * dt; 
+					if (cell.z > cell.targetZ) cell.z = cell.targetZ;
 					this.dirty = true;
 				}
-				
-				if (this.ctrl[i][j].z > 5) {
-					maxElevation = 1;
-				}
-			}
-		}
+				if (cell.z > 5) maxElevation = 1;
+			});
+		});
 		
 		if (maxElevation === 0 && !this.won && this.phase === 'PLAY' && this.surpriseSpawned) {
 			this.won = true;
@@ -276,28 +252,28 @@ class WhackABump {
 		noFill();
 		stroke(70, 110, 170); // Cor azul da malha
 		strokeWeight(1.5);
-		for (let i = 0; i < this.surf_pts.length - 1; i++) {
-			for (let j = 0; j < this.surf_pts[0].length - 1; j++) {
+		this.surf_pts.slice(0, -1).forEach((row, i) => {
+			row.slice(0, -1).forEach((_, j) => {
 				beginShape(QUADS);
 				vertex(this.surf_pts[i][j].x, this.surf_pts[i][j].y, this.surf_pts[i][j].z);
 				vertex(this.surf_pts[i][j+1].x, this.surf_pts[i][j+1].y, this.surf_pts[i][j+1].z);
 				vertex(this.surf_pts[i+1][j+1].x, this.surf_pts[i+1][j+1].y, this.surf_pts[i+1][j+1].z);
 				vertex(this.surf_pts[i+1][j].x, this.surf_pts[i+1][j].y, this.surf_pts[i+1][j].z);
 				endShape(CLOSE);
-			}
-		}
+			});
+		});
 		
 		// Desenhar a grade de controle
 		stroke(255, 200, 50, 160); // Amarelo translúcido
 		strokeWeight(1.5);
 		noFill();
-		for (let i = 0; i < this.nu; i++) {
+		this.ctrl.forEach(row => {
 			beginShape();
-			for (let j = 0; j < this.nv; j++) {
-				vertex(this.ctrl[i][j].x, this.ctrl[i][j].y, this.ctrl[i][j].z);
-			}
+			row.forEach(cell => {
+				vertex(cell.x, cell.y, cell.z);
+			});
 			endShape();
-		}
+		});
 		for (let j = 0; j < this.nv; j++) {
 			beginShape();
 			for (let i = 0; i < this.nu; i++) {
@@ -311,10 +287,9 @@ class WhackABump {
 		
 		let camZ = (height / 2) / Math.tan(PI / 6); // Configuração padrão da perspectiva do p5
 		
-		for (let i = 0; i < this.nu; i++) {
-			for (let j = 0; j < this.nv; j++) {
-				let pt = this.ctrl[i][j];
-				
+		this.ctrl.forEach((row, i) => {
+			row.forEach((cell, j) => {
+				let pt = cell;
 				push();
 				translate(pt.x, pt.y, pt.z);
 				if (pt.targetZ > 10) { 
@@ -347,9 +322,10 @@ class WhackABump {
 					sphere(10);
 				}
 				pop();
-			}
-		}
-		pop(); 
+			});
+		});
+		
+		pop(); // Restore main 3D transform
 		
 		// Barra de tempo na frente
 		push();

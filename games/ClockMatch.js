@@ -1,3 +1,4 @@
+// noprotect
 class ClockMatch {
 	constructor() {
 		this.phase = 'PLAY';

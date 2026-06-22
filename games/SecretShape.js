@@ -1,3 +1,4 @@
+// noprotect
 class SecretShape {
 	constructor() {
 		this.phase = 'ROTATE'; // Fases: 'ROTATE', 'CHOOSE'
