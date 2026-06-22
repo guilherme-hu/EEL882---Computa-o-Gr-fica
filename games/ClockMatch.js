@@ -9,7 +9,7 @@ class ClockMatch {
 		this.targetH = floor(random(24));
 		this.targetM = floor(random(60));
 		
-		// O ponteiro das horas move-se gradualmente conforme os minutos passam
+		// O ponteiro das horas se move conforme os minutos passam
 		this.targetAngleH = (this.targetH % 12) * (TWO_PI / 12) + this.targetM * (TWO_PI / (12 * 60));
 		this.targetAngleM = this.targetM * (TWO_PI / 60);
 		
@@ -30,16 +30,16 @@ class ClockMatch {
 		}
 	}
 	
-	formatTime(h, m) {
-		let sh = h < 10 ? '0' + h : h;
-		let sm = m < 10 ? '0' + m : m;
+	formatTime(h, m) { // Formata a hora como "HH:MM" para exibir no relógio digital
+		let sh = h < 10 ? ('0' + h) : h;
+		let sm = m < 10 ? ('0' + m) : m;
 		return sh + ':' + sm;
 	}
 	
 	createTextGraphic(txt) {
 		let gfx = createGraphics(400, 150);
 		gfx.clear();
-		gfx.fill(0, 255, 50); // Verde digital forte
+		gfx.fill(0, 255, 50); // Verde digital 
 		gfx.textAlign(CENTER, CENTER);
 		gfx.textFont("'Orbitron', Courier New");
 		gfx.textSize(100);
@@ -56,7 +56,6 @@ class ClockMatch {
 		gfx.textFont("'Orbitron', Courier New");
 		gfx.textSize(48);
 		gfx.textStyle(BOLD);
-		// Posicionando no raio ~100 para não encostar nos marcadores
 		gfx.text("12", 180, 80);
 		gfx.text("6", 180, 280);
 		gfx.text("3", 280, 180);
@@ -75,7 +74,7 @@ class ClockMatch {
 		// Sombra
 		gfx.fill(0);
 		gfx.text("Acerte a Hora!", 404, 104);
-		gfx.fill(0, 255, 255); // Ciano em vez de amarelo
+		gfx.fill(0, 255, 255);
 		gfx.text("Acerte a Hora!", 400, 100);
 		return gfx;
 	}
@@ -169,7 +168,7 @@ class ClockMatch {
 	draw() {
 		this.timer += dt;
 		
-		background(80, 120, 180); // Fundo azul moderno
+		background(80, 120, 180); // Fundo azul
 		
 		// Barra de tempo com base na música
 		push();
@@ -238,19 +237,20 @@ class ClockMatch {
 					c.rotZ += c.rotSpeedZ * dt;
 				}
 				pop();
-			} else if (this.result === 'LOSE') {
-				// X vermelho sobrepondo
-				push();
-				translate(0, 0, 100);
-				fill(255, 0, 0);
-				noStroke();
-				rectMode(CENTER);
-				rotateZ(PI/4);
-				rect(0, 0, 40, 200);
-				rotateZ(PI/2);
-				rect(0, 0, 40, 200);
-				pop();
-			}
+			} 
+			// else if (this.result === 'LOSE') {
+			// 	// X vermelho sobrepondo
+			// 	push();
+			// 	translate(0, 0, 100);
+			// 	fill(255, 0, 0);
+			// 	noStroke();
+			// 	rectMode(CENTER);
+			// 	rotateZ(PI/4);
+			// 	rect(0, 0, 40, 200);
+			// 	rotateZ(PI/2);
+			// 	rect(0, 0, 40, 200);
+			// 	pop();
+			// }
 		}
 		
 		// Instrução de início
@@ -279,7 +279,7 @@ class ClockMatch {
 				if (this.result === 'WIN') {
 					winMicrogame();
 				} else {
-					loseMicrogame(); // Só de segurança para sair
+					loseMicrogame(); 
 				}
 			}
 		}
