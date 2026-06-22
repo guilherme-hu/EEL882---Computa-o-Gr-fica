@@ -19,3 +19,6 @@ ESC - pausar o jogo;
 
 Link do projeto no p5js:
 https://editor.p5js.org/GuiHu/sketches/mvMPhJY3S
+
+Link do GitHub Pages desse projeto:
+https://guilherme-hu.github.io/EEL882---Computa-o-Gr-fica/
